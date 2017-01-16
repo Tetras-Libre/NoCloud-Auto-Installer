@@ -1,23 +1,20 @@
 #!/bin/bash - 
-#===============================================================================
 #
-#          FILE: InstallMySql.sh
-# 
-#         USAGE: ./InstallMySql.sh 
-# 
-#   DESCRIPTION: Install MySql and create root user for MySql. It
-#   genereates random password to root user and saves it to /root/.my.cnf
-#   file. The .my.cnf file permissions are the following : 0600. Once the
-#   script is read mysql service is started.
-#       OPTIONS: ---
-#  REQUIREMENTS: ---
-#          BUGS: ---
-#         NOTES: ---
-#        AUTHOR: SEBASTIEN CURT (), sebastien.curt@tetras-libre.fr
-#  ORGANIZATION: 
-#       CREATED: 01/12/2017 09:50:24
-#      REVISION: 0.0.1 
-#===============================================================================
+# Copyright (C) 2017  Tetras Libre <admin@tetras-libre.fr>
+# Author: Curt, Sebastien <sebastien.curt@tetras-libre.fr>
+#
+# This program is free software: you can redistribute it and/or modify # it
+# under the terms of the GNU General Public License as published by # the Free
+# Software Foundation, either version 3 of the License, or # (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, # but WITHOUT
+# ANY WARRANTY; without even the implied warranty of # MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the # GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License # along
+# with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 set -o nounset                              # Treat unset variables as an error
 
@@ -28,10 +25,12 @@ set -o nounset                              # Treat unset variables as an error
 # 3. Configure MySql with mysql_secure_installation
 # 4. Start mysql service
 ###########################################################################
+
+# If mysql not installed then install it
 DEBIAN_FRONTEND='noninteractive' apt-get -qq install mysql-server \
     apg expect
 
-export mysqlPassword="$(apg -q -a 0 -n 1 -m 21 -E "\"\'\`" -M NCL)"
+mysqlPassword="$(apg -q -a 0 -n 1 -m 21 -E "\"\'\`" -M NCL)"
 
 # Save in Root home directory connection configuration
 if [ ! -e "${HOME}/.my.cnf" ]
@@ -42,6 +41,9 @@ then
     echo "password=${mysqlPassword}"
     } | tee '/root/.my.cnf' > "${HOME}/.my.cnf";
     chmod 400 '/root/.my.cnf' "${HOME}/.my.cnf";
+else
+    echo "MySQL already configured" >2
+    exit
 fi
 
 service mysql start

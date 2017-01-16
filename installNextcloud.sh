@@ -26,6 +26,8 @@ set -o nounset                              # Treat unset variables as an error
 ###########################################################################
 SCRIPT_DIRECTORY=`pwd`
 . `pwd`/installNextcloud.env
+
+
 if [ ! -d $NEXTCLOUD_DIRECTORY_SOURCES ]
 then
     mkdir -p $NEXTCLOUD_DIRECTORY_SOURCES
@@ -35,6 +37,13 @@ cd $NEXTCLOUD_DIRECTORY_SOURCES
 # 1. Download Nexcloud Package
 DEBIAN_FRONTEND='noninteractive' apt-get -qq install wget gnupg2 \
     bzip2 tar apache2 isomd5sum ufw sudo
+
+if [ -d ${NEXTCLOUD_INSTALL_DIR} ]
+then
+    echo "Nextcloud install directory already exists : " \
+        ${NEXTCLOUD_INSTALL_DIR} >2
+    return
+fi
 
 {
     # insert nextcloud download
@@ -73,6 +82,7 @@ md5sum --quiet -c ${NEXTCLOUD_PACKAGE}.md5 < ${NEXTCLOUD_PACKAGE} \
 # stop if the package isn't reliable
 if [ $? -ne 0 ]
 then
+    echo "Nextcloud packages unsafe" >2
     return
 fi
 
@@ -81,12 +91,21 @@ tar xf ${NEXTCLOUD_VERSION}.tar
 cp -r nextcloud $(dirname ${NEXTCLOUD_INSTALL_DIR%/})
 chown -R www-data:www-data ${NEXTCLOUD_INSTALL_DIR}
 
+sudo -u www-data php ${NEXTCLOUD_INSTALL_DIR}occ -V | grep -q "Nextcloud is not installed"
+
+if [ $? -ne 0 ]
+then
+    echo "Nexcloud already installed"
+    return
+fi
+
 # Set the max php size from 13Mo to 16Go
 sed -i.bak -e 's/\(upload_max_filesize\).*/\1 16G/' \
     -e 's/\(post_max_size\).*/\1 16G/' \
     ${NEXTCLOUD_INSTALL_DIR}.htaccess
 
 # set max input time from 1 minute to 1 hour
+# php timeout for large file
 sed -i.bak -e 's/\(max_input_time =\).*/\1 3600/' \
     -e 's/\(max_execution_time =\).*/\1 3600/' \
     /etc/php5/apache2/php.ini
@@ -167,6 +186,7 @@ ${NEXTCLOUD_DATA_DIR:+--data-dir=${NEXTCLOUD_DATA_DIR}}"
 nextcloud_Install_Options=$(echo ${nextcloud_Install_Options} | tr -s \
     '[:space:]' ' ')
 
+
 # Install Nexcloud
 sudo -u www-data php ${NEXTCLOUD_INSTALL_DIR}occ  \
     maintenance:install ${nextcloud_Install_Options}
@@ -185,46 +205,46 @@ cd ${SCRIPT_DIRECTORY}
 . `pwd`/nextcloudStrongDirectoryPermissions.sh
 
 # Configure Apache for nextcloud
-echo "Configure Apache nextcloud-ssl.conf"
-sed \
-    "s@<+NEXTCLOUD_CONFIG_ServerAdmin+>@${NEXTCLOUD_CONFIG_ServerAdmin}@
-s@<+NEXTCLOUD_CONFIG_ServerName+>@${NEXTCLOUD_CONFIG_ServerName}@" \
-`pwd`/template_nextcloud-ssl.conf > \
-    /etc/apache2/sites-available/nextcloud-ssl.conf
+#echo "Configure Apache nextcloud-ssl.conf"
+#sed \
+#    "s@<+NEXTCLOUD_CONFIG_ServerAdmin+>@${NEXTCLOUD_CONFIG_ServerAdmin}@
+#    s@<+NEXTCLOUD_CONFIG_ServerName+>@${NEXTCLOUD_CONFIG_ServerName}@" \
+#`pwd`/template_nextcloud-ssl.conf > \
+#    /etc/apache2/sites-available/nextcloud-ssl.conf
 
-sed \
-    "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
-    s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
-        `pwd`/template_ssl.conf > \
-        /etc/apache2/ssl.conf
+#sed \
+#    "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
+#    s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
+#        `pwd`/template_ssl.conf > \
+#        /etc/apache2/ssl.conf
 
 
-ln -s /etc/apache2/sites-available/nextcloud-ssl.conf \
-    /etc/apache2/sites-enabled/nextcloud-ssl.conf
-echo "WARNING : SSLEngine is disabled : to enable modify file /etc/apache2/ssl.conf"
-echo "Configure Apache nextcloud-ssl.conf : terminated"
+#ln -s /etc/apache2/sites-available/nextcloud-ssl.conf \
+#    /etc/apache2/sites-enabled/nextcloud-ssl.conf
+#echo "WARNING : SSLEngine is disabled : to enable modify file /etc/apache2/ssl.conf"
+#echo "Configure Apache nextcloud-ssl.conf : terminated"
 
-echo "a2enmod rewrite"
-a2enmod rewrite
-echo "a2enmod rewrite : terminated"
-echo "a2enmod headers"
-a2enmod headers
-echo "a2enmod env"
-a2enmod env
-echo "a2enmod env : terminated"
-echo "a2enmod dir"
-a2enmod dir
-echo "a2enmod dir : terminated"
-echo "a2enmod mime"
-a2enmod mime
-echo "a2enmod mime : terminated"
-echo "a2enmod ssl"
-a2enmod ssl
-echo "a2enmod ssl : terminated"
-
-echo "service apache2 restart"
-service apache2 restart
-echo "service apache2 restart : terminated"
+#echo "a2enmod rewrite"
+#a2enmod rewrite
+#echo "a2enmod rewrite : terminated"
+#echo "a2enmod headers"
+#a2enmod headers
+#echo "a2enmod env"
+#a2enmod env
+#echo "a2enmod env : terminated"
+#echo "a2enmod dir"
+#a2enmod dir
+#echo "a2enmod dir : terminated"
+#echo "a2enmod mime"
+#a2enmod mime
+#echo "a2enmod mime : terminated"
+#echo "a2enmod ssl"
+#a2enmod ssl
+#echo "a2enmod ssl : terminated"
+#
+#echo "service apache2 restart"
+#service apache2 restart
+#echo "service apache2 restart : terminated"
 
 # activation ssl
 #a2enmod ssl

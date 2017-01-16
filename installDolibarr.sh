@@ -69,5 +69,8 @@ then
 fi
 mount /usr/share/dolibarr/documents
 
+sed "s@<+ServerAdmin+>@${DOLIBARR_CONFIG_ServerAdmin:?}@;
+    s@<+ServerName+>@${DOLIBARR_CONFIG_ServerName:?}@"
+
 
 cd ${SCRIPT_DIRECTORY}

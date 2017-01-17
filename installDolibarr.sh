@@ -23,7 +23,7 @@ then
     . `pwd`/installDolibarr.env
 fi
 
-DOLIBARR_INSTALL_DIR=${DOLIBARR_INSTALL_DIR:-/var/www}
+DOLIBARR_INSTALL_DIR=${DOLIBARR_INSTALL_DIR:-/var/www/}
 DOLIBARR_PKG_NAME=${DOLIBARR_PKG_NAME:-dolibarr_4.0.3-4_all.deb}
 SCRIPT_DIRECTORY=`pwd`
 

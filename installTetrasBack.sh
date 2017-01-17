@@ -29,4 +29,4 @@ make dependencies
 make
 make config
 
-cd OriginalDirectory
+cd $OriginalDirectory

@@ -18,13 +18,10 @@
 
 set -o nounset                              # Treat unset variables as an error
 
-
-###########################################################################
-# 1. Install MySql
-# 2. Save root password to file /root/.my.cnf
-# 3. Configure MySql with mysql_secure_installation
-# 4. Start mysql service
-###########################################################################
+if [ -f installMySQL.env ]
+then
+    . `pwd`/installMySQL.env
+fi
 
 # If mysql not installed then install it
 DEBIAN_FRONTEND='noninteractive' apt-get -qq install mysql-server \
@@ -102,6 +99,6 @@ rm -v ${configureMySQLFile} # Remove the generated Expect script
 unset configureMySQLFile
 unset MYSQL_ROOT_PASSWORD
 
-echo "MySQL setup completed. Insecure defaults are gone. Please remove"
-echo " this script manually when you are done with it (or at least "
-echo "remove the MySQL root password that you put inside it."
+echo "MySQL setup completed. Insecure defaults are gone. Please remove" \
+     "this script manually when you are done with it (or at least " \
+     "remove the MySQL root password that you put inside it."

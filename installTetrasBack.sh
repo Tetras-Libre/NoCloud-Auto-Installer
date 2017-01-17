@@ -18,27 +18,15 @@
 
 set -o nounset                              # Treat unset variables as an error
 
-if [ -f initInstall.sh ]
-then
-    . `pwd`/initInstall.sh
-fi
+DEBIAN_FRONTEND="noninteractive" apt-get install git gnulib perl sendmail udev \
+    systemd
 
-if [ -f installMySQL.sh ]
-then
-    . `pwd`/installMySQL.sh
-fi
+OriginalDirectory=`pwd`
 
-if [ -f installNextcloud.sh ]
-then
-    . `pwd`/installNextcloud.sh
-fi
+git clone https://gitlab.tetras-libre.fr/tetras-libre/Tetras-back.git
+cd Tetras-back
+make dependencies
+make
+make config
 
-if [ -f installDolibarr.sh ]
-then
-    . `pwd`/installDolibarr.sh
-fi
-
-if [ -f installTetrasBack.sh ]
-then
-    . `pwd`/installTetrasBack.sh
-fi
+cd OriginalDirectory

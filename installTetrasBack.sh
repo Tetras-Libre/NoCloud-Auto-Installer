@@ -18,15 +18,17 @@
 
 set -o nounset                              # Treat unset variables as an error
 
-DEBIAN_FRONTEND="noninteractive" apt-get install git gnulib perl sendmail udev \
-    systemd
+DEBIAN_FRONTEND="noninteractive" apt-get -qq install git gnulib perl sendmail \
+    udev systemd
 
 OriginalDirectory=`pwd`
 
 git clone https://gitlab.tetras-libre.fr/tetras-libre/Tetras-back.git
 cd Tetras-back
+export DEBIAN_FRONTEND="noninteractive"
 make dependencies
 make
 make config
+unset DEBIAN_FRONTEND
 
 cd $OriginalDirectory

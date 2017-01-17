@@ -20,6 +20,7 @@ set -o nounset                              # Treat unset variables as an error
 
 apt-get clean
 
+# Add stable backports to source.list and set preferences
 if  ! $(grep -Rq "jessie-backports" /etc/apt/sources.list /etc/apt/sources.list.d)
 then
     (
@@ -36,6 +37,7 @@ then
     echo "Pin-Priority: 900"
     ) > /etc/apt/preferences.d/backports
 fi
+
 
 apt-get update
 

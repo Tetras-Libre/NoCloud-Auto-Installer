@@ -30,7 +30,7 @@ set -o nounset                              # Treat unset variables as an error
 DEBIAN_FRONTEND='noninteractive' apt-get -qq install mysql-server \
     apg expect
 
-mysqlPassword="$(apg -q -a 0 -n 1 -m 21 -E "\"\'\`" -M NCL)"
+MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-$(apg -q -a 0 -n 1 -m 21 -M NCL)}
 
 # Save in Root home directory connection configuration
 if [ ! -e "${HOME}/.my.cnf" ]
@@ -38,11 +38,15 @@ then
     {
     echo "[client]"
     echo "user=root"
-    echo "password=${mysqlPassword}"
+    echo "password=${MYSQL_ROOT_PASSWORD}"
+    echo ""
+    echo "[mysqldump]"
+    echo "user=root"
+    echo "password=${MYSQL_ROOT_PASSWORD}"
     } | tee '/root/.my.cnf' > "${HOME}/.my.cnf";
     chmod 400 '/root/.my.cnf' "${HOME}/.my.cnf";
 else
-    echo "MySQL already configured" >2
+    echo "MySQL already configured" >&2
     exit
 fi
 
@@ -61,10 +65,10 @@ echo "expect -re \"Set root password\?.*\""
 echo "send \"y\r\""
 
 echo "expect -re \"New password:.*\""
-echo "send \"${mysqlPassword}\r\""
+echo "send \"${MYSQL_ROOT_PASSWORD}\r\""
 
 echo "expect \"Re-enter new password:\""
-echo "send \"${mysqlPassword}\r\""
+echo "send \"${MYSQL_ROOT_PASSWORD}\r\""
 
 echo "expect -re \"Remove anonymous users\?.*\""
 echo "send \"y\r\""
@@ -87,16 +91,16 @@ expect  ${configureMySQLFile}
 # allow PHP to access to mysql
 mysql -e "
 GRANT ALL PRIVILEGES on *.* to 'root'@'localhost' IDENTIFIED BY 
-'${mysqlPassword}';
+'${MYSQL_ROOT_PASSWORD}';
 GRANT ALL PRIVILEGES on *.* to 'root'@'127.0.0.1' IDENTIFIED BY
-'${mysqlPassword}';
+'${MYSQL_ROOT_PASSWORD}';
 FLUSH PRIVILEGES;"
 
 # Cleanup
 rm -v ${configureMySQLFile} # Remove the generated Expect script
 
 unset configureMySQLFile
-unset mysqlPassword
+unset MYSQL_ROOT_PASSWORD
 
 echo "MySQL setup completed. Insecure defaults are gone. Please remove"
 echo " this script manually when you are done with it (or at least "

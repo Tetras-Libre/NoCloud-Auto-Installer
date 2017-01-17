@@ -27,6 +27,8 @@ set -o nounset                              # Treat unset variables as an error
 SCRIPT_DIRECTORY=`pwd`
 . `pwd`/installNextcloud.env
 
+RUNNING_DATE_TIME="`$(date +%Y%m%d%H%M%S)`"
+
 
 if [ ! -d $NEXTCLOUD_DIRECTORY_SOURCES ]
 then
@@ -36,12 +38,12 @@ fi
 cd $NEXTCLOUD_DIRECTORY_SOURCES
 # 1. Download Nexcloud Package
 DEBIAN_FRONTEND='noninteractive' apt-get -qq install wget gnupg2 \
-    bzip2 tar apache2 isomd5sum ufw sudo
+    bzip2 tar apache2 isomd5sum ufw sudo apg
 
 if [ -d ${NEXTCLOUD_INSTALL_DIR} ]
 then
     echo "Nextcloud install directory already exists : " \
-        ${NEXTCLOUD_INSTALL_DIR} >2
+        ${NEXTCLOUD_INSTALL_DIR} >&2
     return
 fi
 
@@ -75,14 +77,14 @@ gpg2 --import nextcloud.asc
 
 # 2. Check package integrity and source authenticity
 md5sum --quiet -c ${NEXTCLOUD_PACKAGE}.md5 < ${NEXTCLOUD_PACKAGE} \
-    && gpg2 --verbose --batch --output - --no-auto-check-trustdb \
-    --verify ${NEXTCLOUD_PACKAGE}.asc ${NEXTCLOUD_PACKAGE} \
-    2>&1 | grep -q "Good signature"
+    && LC_ALL="en_US.utf-8" gpg2 --verbose --batch --output - \
+    --no-auto-check-trustdb --verify ${NEXTCLOUD_PACKAGE}.asc \
+    ${NEXTCLOUD_PACKAGE} 2>&1 | grep -q "Good signature"
 
 # stop if the package isn't reliable
 if [ $? -ne 0 ]
 then
-    echo "Nextcloud packages unsafe" >2
+    echo "Nextcloud packages unsafe" >&2
     return
 fi
 
@@ -91,7 +93,7 @@ tar xf ${NEXTCLOUD_VERSION}.tar
 cp -r nextcloud $(dirname ${NEXTCLOUD_INSTALL_DIR%/})
 chown -R www-data:www-data ${NEXTCLOUD_INSTALL_DIR}
 
-sudo -u www-data php ${NEXTCLOUD_INSTALL_DIR}occ -V | grep -q "Nextcloud is not installed"
+LC_ALL="en_US.utf-8" sudo -u www-data php ${NEXTCLOUD_INSTALL_DIR}occ -V | grep -q "Nextcloud is not installed"
 
 if [ $? -ne 0 ]
 then
@@ -204,19 +206,30 @@ cd ${SCRIPT_DIRECTORY}
 
 . `pwd`/nextcloudStrongDirectoryPermissions.sh
 
-# Configure Apache for nextcloud
-#echo "Configure Apache nextcloud-ssl.conf"
-#sed \
-#    "s@<+NEXTCLOUD_CONFIG_ServerAdmin+>@${NEXTCLOUD_CONFIG_ServerAdmin}@
-#    s@<+NEXTCLOUD_CONFIG_ServerName+>@${NEXTCLOUD_CONFIG_ServerName}@" \
-#`pwd`/template_nextcloud-ssl.conf > \
-#    /etc/apache2/sites-available/nextcloud-ssl.conf
+if [ -f /etc/apache2/nextcloud-ssl.conf ]
+then
+    cp /etc/apache2/nextcloud-ssl.conf \
+        /etc/apache2/${RUNNING_DATE_TIME}_nextcloud-ssl.conf
+fi
 
-#sed \
-#    "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
-#    s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
-#        `pwd`/template_ssl.conf > \
-#        /etc/apache2/ssl.conf
+if [ -f /etc/apache2/ssl.conf ]
+then
+    cp /etc/apache2/ssl.conf /etc/apache2/${RUNNING_DATE_TIME}_ssl.conf
+fi
+
+# Configure Apache for nextcloud
+echo "Configure Apache nextcloud-ssl.conf"
+sed \
+    "s@<+NEXTCLOUD_CONFIG_ServerAdmin+>@${NEXTCLOUD_CONFIG_ServerAdmin}@
+    s@<+NEXTCLOUD_CONFIG_ServerName+>@${NEXTCLOUD_CONFIG_ServerName}@" \
+`pwd`/template_nextcloud-ssl.conf > \
+    /etc/apache2/sites-available/nextcloud-ssl.conf
+
+sed \
+    "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
+    s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
+        `pwd`/template_ssl.conf > \
+        /etc/apache2/ssl.conf
 
 
 #ln -s /etc/apache2/sites-available/nextcloud-ssl.conf \
@@ -224,27 +237,30 @@ cd ${SCRIPT_DIRECTORY}
 #echo "WARNING : SSLEngine is disabled : to enable modify file /etc/apache2/ssl.conf"
 #echo "Configure Apache nextcloud-ssl.conf : terminated"
 
-#echo "a2enmod rewrite"
-#a2enmod rewrite
-#echo "a2enmod rewrite : terminated"
-#echo "a2enmod headers"
-#a2enmod headers
-#echo "a2enmod env"
-#a2enmod env
-#echo "a2enmod env : terminated"
-#echo "a2enmod dir"
-#a2enmod dir
-#echo "a2enmod dir : terminated"
-#echo "a2enmod mime"
-#a2enmod mime
-#echo "a2enmod mime : terminated"
-#echo "a2enmod ssl"
-#a2enmod ssl
-#echo "a2enmod ssl : terminated"
-#
-#echo "service apache2 restart"
-#service apache2 restart
-#echo "service apache2 restart : terminated"
+echo "a2enmod rewrite"
+a2enmod rewrite
+echo "a2enmod rewrite : terminated"
+echo "a2enmod headers"
+a2enmod headers
+echo "a2enmod env"
+a2enmod env
+echo "a2enmod env : terminated"
+echo "a2enmod dir"
+a2enmod dir
+echo "a2enmod dir : terminated"
+echo "a2enmod mime"
+a2enmod mime
+echo "a2enmod mime : terminated"
+echo "a2enmod ssl"
+a2enmod ssl
+echo "a2enmod ssl : terminated"
+
+echo "service apache2 restart"
+service apache2 restart
+echo "service apache2 restart : terminated"
+echo "WARNING : apache ssl isn't activated => to activate it : run following" \
+     "command : " \
+     "a2enmod ssl; a2ensite default-ssl; service apache2 reload"
 
 # activation ssl
 #a2enmod ssl

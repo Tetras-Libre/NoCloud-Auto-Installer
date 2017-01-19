@@ -42,7 +42,21 @@ fi
 apt-get update
 
 DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
-    tmux debian-goodies php5 fail2ban vim-nox certbot apt-transport-https \
-    unattended-upgrades tar php5-gd php5-curl php5-intl php5-mcrypt \
-    php5-mysql php5-apcu wget libapache2-mod-php5 postfix
-
+    apt-transport-https \
+    certbot \
+    debian-goodies \
+    fail2ban \
+    libapache2-mod-php5 \
+    php5 \
+    php5-apcu \
+    php5-curl \
+    php5-gd \
+    php5-intl \
+    php5-mcrypt \
+    php5-mysql \
+    postfix \
+    tar \
+    tmux \
+    unattended-upgrades \
+    vim-nox \
+    wget

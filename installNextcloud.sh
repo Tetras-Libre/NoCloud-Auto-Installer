@@ -37,8 +37,23 @@ fi
 
 cd $NEXTCLOUD_DIRECTORY_SOURCES
 # 1. Download Nexcloud Package
-DEBIAN_FRONTEND='noninteractive' apt-get -qq install wget gnupg2 \
-    bzip2 tar apache2 isomd5sum ufw sudo apg
+DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
+    apache2 \
+    apg \
+    bzip2 \
+    gnupg2 \
+    isomd5sum \
+    php5 \
+    php5-apcu \
+    php5-curl \
+    php5-gd \
+    php5-intl \
+    php5-mcrypt \
+    php5-mysql \
+    sudo \
+    tar \
+    ufw \
+    wget
 
 if [ -d ${NEXTCLOUD_INSTALL_DIR} ]
 then
@@ -47,6 +62,7 @@ then
     return
 fi
 
+echo "Begin to download nextcloud packages"
 {
     # insert nextcloud download
     echo "${NEXTCLOUD_PACKAGE}"
@@ -67,6 +83,7 @@ wget --output-file=wget_nextcloud.log \
     --input-file=$NEXTCLOUD_WGET_INPUT
 
 # Downloa NextCloud GPG
+echo "Download authentic key of nextcloud"
 wget --output-file=wget_nextcloud.log \
     --tries=5 \
     --continue \
@@ -75,6 +92,7 @@ wget --output-file=wget_nextcloud.log \
 
 gpg2 --import nextcloud.asc
 
+echo "Check both package integrity and sources authenticity"
 # 2. Check package integrity and source authenticity
 md5sum --quiet -c ${NEXTCLOUD_PACKAGE}.md5 < ${NEXTCLOUD_PACKAGE} \
     && LC_ALL="en_US.utf-8" gpg2 --verbose --batch --output - \
@@ -88,18 +106,21 @@ then
     return
 fi
 
+echo "Extract nextcloud archives"
 bzip2 -d ${NEXTCLOUD_PACKAGE}
 tar xf ${NEXTCLOUD_VERSION}.tar
 cp -r nextcloud $(dirname ${NEXTCLOUD_INSTALL_DIR%/})
 chown -R www-data:www-data ${NEXTCLOUD_INSTALL_DIR}
 
+echo "Check Nextcloud is not installed"
 LC_ALL="en_US.utf-8" sudo -u www-data php ${NEXTCLOUD_INSTALL_DIR}occ -V | grep -q "Nextcloud is not installed"
 
 if [ $? -ne 0 ]
 then
-    echo "Nexcloud already installed"
+    echo "Nextcloud already installed"
     return
 fi
+echo "Nexcloud isn't already installed => continue installation"
 
 # Set the max php size from 13Mo to 16Go
 sed -i.bak -e 's/\(upload_max_filesize\).*/\1 16G/' \
@@ -112,6 +133,7 @@ sed -i.bak -e 's/\(max_input_time =\).*/\1 3600/' \
     -e 's/\(max_execution_time =\).*/\1 3600/' \
     /etc/php5/apache2/php.ini
 
+echo "configure mysqld compatiblity to nextcloud"
 # configure mysqld for nextcloud
 {
     echo "[mysqld]"
@@ -121,35 +143,60 @@ sed -i.bak -e 's/\(max_input_time =\).*/\1 3600/' \
     echo "innodb_file_format=barracuda"
     echo "innodb_file_per_table=true"
 } > /etc/mysql/conf.d/mysqld.cnf
+echo "mysql configure to nextcloud compatibility : check" \
+     "file /etc/mysql/conf.d/mysql.cnf"
 
 # Create nextcloud database in mysql
+echo "create nextcloud database"
+echo "mysql -e 'CREATE DATABASE nextcloud CHARACTER SET = \"utf8mb4\"" \
+     "COLLATE = \"utf8mb4_general_ci\";'"
 mysql -e 'CREATE DATABASE nextcloud CHARACTER
 SET = "utf8mb4" COLLATE = "utf8mb4_general_ci";'
+echo "Nextcloud database created"
 
+echo "Create nextcloud Password for nextcloud database"
 nextcloudPassword=${NEXTCLOUD_DATABASE_PASS:-"$(apg -q -a 0 -n 1 -m 21 -M NCL)"}
-
-adminPassword=${NEXTCLOUD_ADMIN_PASS=-"$(apg -q -a 0 -n 1 -m 21 -M NCL)"}
-
 {
     echo "[client]"
     echo "user=nextcloud"
     echo "password=${nextcloudPassword}"
 } > ${HOME}/.nextcloud.my.cnf
 chmod 600 ${HOME}/.nextcloud.my.cnf
+echo "nextloud user password store in ${home}/.nextcloud.my.cnf only" \
+    "readable by the root user"
 
+
+echo "Create admin Password for nextcloud database"
+adminPassword=${NEXTCLOUD_ADMIN_PASS=-"$(apg -q -a 0 -n 1 -m 21 -M NCL)"}
 {
     echo "[client]"
     echo "user=admin"
     echo "password=${adminPassword}"
 } > ${HOME}/.adminNextcloud.my.cnf
 chmod 600 ${HOME}/.adminNextcloud.my.cnf
+echo "amdin user password store in ${home}/.admin.my.cnf only" \
+    "readable by the root user"
 
+echo "Set nextcloud user for nextcloud@localhost in database"
 mysql -e "CREATE USER 'nextcloud'@'localhost' IDENTIFIED BY
 '${nextcloudPassword}';"
+if [ $? -eq 0 ]
+then
+    echo "nextcloud user set for nextcloud@localhost in database"
+else
+    echo "error processing : $?" >&2
+fi
 
+echo "Grant all privileges to nexcloud user to nextcloud database"
 mysql -e "GRANT ALL PRIVILEGES on nextcloud.* to
 'nextcloud'@'localhost' IDENTIFIED BY '${nextcloudPassword}';
 FLUSH PRIVILEGES;";
+if [ $? -eq 0 ]
+then
+    echo "Privileges granted"
+else
+    echo "Error processing : $?" >&2
+fi
 
 #    service mysql restart
 
@@ -201,7 +248,7 @@ fi
 
 # remove all downloaded files
 cd ..
-    rm -r $NEXTCLOUD_DIRECTORY_SOURCES
+rm -r $NEXTCLOUD_DIRECTORY_SOURCES
 cd ${SCRIPT_DIRECTORY}
 
 . `pwd`/nextcloudStrongDirectoryPermissions.sh
@@ -283,9 +330,10 @@ echo "cd ${NEXTCLOUD_INSTALL_DIR}config : terminated"
 
 sections=${NEXTCLOUD_CONFIG_trusted_domains:-\
     "${NEXTCLOUD_CONFIG_trusted_domains}"}
-sections="${sections} 'memcache.local' => '  OC\Memcache\APCu',"
+sections="${sections} 'memcache.local' => 'OC\\Memcache\\APCu',"
 # sections=$(echo $sections | tr -s '[:space:]' ' ')
 
+echo "Set /var/www/nexcloud/config/config.php"
 sed -i.bak "/'trusted_domains'/,/),/d;
 s@)@${sections})@;
 /array(/s@,@,\n@g;
@@ -295,6 +343,7 @@ echo "sed -i.bak \"/'trusted_domains'/,/),/d;" \
      "s@)@${sections})@;" \
      "/array(/s@,@,\n@g;" \
      "s@^\(\S\)@  \1@g;\" `pwd`/config.php : terminated"
+echo "WARNING : Take a look at /var/www/nexcloud/config/config.php"
 
 cd ${SCRIPT_DIRECTORY}
 

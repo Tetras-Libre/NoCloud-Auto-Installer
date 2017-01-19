@@ -4,7 +4,7 @@ ocpath=${ocpath:-'/var/www/nextcloud'}
 htuser=${htuser:-'www-data'}
 htgroup=${htgroup:-'www-data'}
 rootuser=${rootuser:-'root'}
-datapath=${datapath:-'/home/nextcloud/data'}
+datapath=${datapath:-'/home/nextcloud'}
 
 echo "nextcloudStringDirectoryPermission"
 

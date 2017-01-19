@@ -26,51 +26,124 @@ fi
 DOLIBARR_INSTALL_DIR=${DOLIBARR_INSTALL_DIR:-/var/www/}
 DOLIBARR_PKG_NAME=${DOLIBARR_PKG_NAME:-dolibarr_4.0.3-4_all.deb}
 SCRIPT_DIRECTORY=`pwd`
+DOLIBARR_LOGFILE="${SCRIPT_DIRECTORY%%/}/installDolibarr.log"
+RUNNING_DATE_TIME="$(date +%Y%m%d%H%M%S)"
 
-apt-get update && apt-get install mount
+if [ ${VERBOSE:-0} -ne 0 ]
+then
+    echo "DEBIAN_FRONTEND=noninteractive apt-get update" \
+        "&& DEBIAN_FRONTEND=noninteractive apt-get -y install mount zip unzip"
+fi
+
+DEBIAN_FRONTEND='noninteractive' apt-get update \
+    && DEBIAN_FRONTEND='noninteractive' apt-get -qq install mount zip unzip
+
 
 if [ ! -d ${DOLIBARR_INSTALL_DIR} ]
 then
-    mkdir -p ${DOLIBARR_INSTALL_DIR}
+    mkdir -p${VERBOSE:+v} ${DOLIBARR_INSTALL_DIR}
 fi
 
-cp `pwd`"/DOLIBARR_PACKAGES/"${DOLIBARR_PKG_NAME} ${DOLIBARR_INSTALL_DIR%%/}/
+cp ${VERBOSE:+-v} `pwd`"/DOLIBARR_PACKAGES/"${DOLIBARR_PKG_NAME} \
+    ${DOLIBARR_INSTALL_DIR%%/}/
+
+echo "cd ${DOLIBARR_INSTALL_DIR}"
 cd ${DOLIBARR_INSTALL_DIR}
 
+echo "dpkg -i `pwd`/${DOLIBARR_PKG_NAME}"
 dpkg -i `pwd`/${DOLIBARR_PKG_NAME}
-apt-get install -f
+echo "apt-get install -yf"
+DEBIAN_FRONTEND='noninteractive' apt-get install -yf
 
 DOLIBARR_DOCUMENTS_DIR=${DOLIBARR_DOCUMENTS_DIR:-/usr/share/dolibarr/documents/}
 
-if [ ! -d ${DOLIBARR_DOCUMENTS_DIR%/} ]
+if [ ! -d ${DOLIBARR_DOCUMENTS_DIR%%/} ]
 then
-    mkdir -p ${DOLIBARR_DOCUMENTS_DIR%/}
+    echo "mkdir -p${VERBOSE:+v} ${DOLIBARR_DOCUMENTS_DIR%/}"
 
+    mkdir -p${VERBOSE:+v} ${DOLIBARR_DOCUMENTS_DIR%/}
 else
     echo "${DOLIBARR_DOCUMENTS_DIR%/} already exists : save it in" \
     "${DOLIBARR_DOCUMENTS_DIR%/}.tar"
+
     oldDir=`pwd`
+    echo "cd `dirname ${DOLIBARR_DOCUMENTS_DIR%/}`"
     cd `dirname ${DOLIBARR_DOCUMENTS_DIR%/}`
-    tar cf --recursive-unlink ${DOLIBARR_DOCUMENTS_DIR%/}.tar documents 
+    tar c${VERBOSE:+v}f --recursive-unlink ${DOLIBARR_DOCUMENTS_DIR%/}.tar \
+        documents 
+
+    echo "cd ${oldDir}"
     cd ${oldDir}
 fi
 
+
+
 if [ ! -d /home/dolibarr ]
 then
-    mkdir -p /home/dolibarr
+    echo "mkdir -p${VERBOSE:+v} /home/dolibarr"
+    mkdir -p${VERBOSE:+v} /home/dolibarr
 fi
 
-mv ${DOLIBARR_DOCUMENTS_DIR%/}/* /home/dolibarr/
+echo "mv ${VERBOSE:+-v} ${DOLIBARR_DOCUMENTS_DIR%/}/* /home/dolibarr/"
+mv ${VERBOSE:+-v} ${DOLIBARR_DOCUMENTS_DIR%/}/* /home/dolibarr/
 
 if [ -f /etc./fstab ]
 then
-    echo "/home/dolibarr  /usr/share/dolibarr/documents none bind 0 0" \
-        >> /etc/fstab
+    echo "/home/dolibarr/usr/share/dolibarr/documents none bind 0 0"
+else
+    echo "\"/home/dolibarr/usr/share/dolibarr/documents none bind 0 0\"" \
+        "> /etc/fstab"
+    echo "/home/dolibarr/usr/share/dolibarr/documents none bind 0 0" \
+        > /etc/fstab
 fi
-mount /usr/share/dolibarr/documents
+mount ${VERBOSE:+v} /usr/share/dolibarr/documents
 
-sed "s@<+ServerAdmin+>@${DOLIBARR_CONFIG_ServerAdmin:?}@;
-    s@<+ServerName+>@${DOLIBARR_CONFIG_ServerName:?}@"
+echo "Set dolibarr's configuration file for apache 2"
 
+# Save last dolibarr-ssh.conf if exists
+if [ -f /etc/apache2/sites-available/dolibarr-ssl.conf ]
+then
+    echo "Dolibarr's apache configuration already exists"
+    echo "Backup file is created at" \
+        "/etc/apache2/sites-available/${RUNNING_DATE_TIME}_dolibarr-ssl.conf"
 
+    echo "cp ${VERBOSE:+-v} /etc/apache2/sites-available/dolibarr-ssl.conf" \
+        "/etc/apache2/sites-available/${RUNNING_DATE_TIME}_dolibarr-ssl.conf"
+    cp ${VERBOSE:+-v} /etc/apache2/sites-available/dolibarr-ssl.conf \
+    /etc/apache2/sites-available/${RUNNING_DATE_TIME}_dolibarr-ssl.conf
+fi
+sed "s@<+ServerAdmin+>@${DOLIBARR_CONFIG_ServerAdmin:-<+ServerAdmin+>}@;
+    s@<+ServerName+>@${DOLIBARR_CONFIG_ServerName:-<+ServerName+>}@" \
+        ${SCRIPT_DIRECTORY%%/}/template_dolibarr-ssl.conf > \
+    /etc/apache2/sites-available/dolibarr-ssl.conf
+
+# Set ssl.conf
+if [ -f /etc/apache2/sites-available/ssl.conf ]
+then
+    echo "Apache ssl configuration already exists"
+    echo "Backup file is created at " \
+        "/etc/apache2/sites-available/${RUNNING_DATE_TIME}-ssl.conf"
+
+    echo "cp ${VERBOSE:+-v} /etc/apache2/sites-available/dolibarr-ssl.conf" \
+    "/etc/apache2/sites-available/${RUNNING_DATE_TIME}-ssl.conf"
+    cp ${VERBOSE:+-v} /etc/apache2/ssl.conf \
+    /etc/apache2/${RUNNING_DATE_TIME}-ssl.conf
+fi
+sed \
+    "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
+    s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
+        ${SCRIPT_DIRECTORY%%/}/template_ssl.conf > \
+        /etc/apache2/ssl.conf
+
+echo "#######################################################################"
+echo "WARNING : new configuration file for dolibarr is installed in" \
+    "/etc/apache2/sites-available/"
+echo "before any activation of the website, check it then" \
+    "use the following command :"
+echo "ln -s /etc/apache2/sites-available/dolibarr-ssl.conf" \
+    "/etc/apache2/sites-enabled/dolibarr-ssl.conf"
+echo "Take a look at /etc/apache2/ssl.conf to check configuration state"
+echo "#######################################################################"
+
+echo "cd ${SCRIPT_DIRECTORY}"
 cd ${SCRIPT_DIRECTORY}

@@ -23,7 +23,12 @@ then
     . `pwd`/installMySQL.env
 fi
 
+SCRIPT_DIRECTORY=`pwd`
+SCRIPT_LOG="${SCRIPT_DIRECTORY%%/}/installMySQL.log"
+
 # If mysql not installed then install it
+echo "DEBIAN_FRONTEND='noninteractive' apt-get -qq install mysql-server" \
+    "apg expect"
 DEBIAN_FRONTEND='noninteractive' apt-get -qq install mysql-server \
     apg expect
 
@@ -32,6 +37,7 @@ MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-$(apg -q -a 0 -n 1 -m 21 -M NCL)}
 # Save in Root home directory connection configuration
 if [ ! -e "${HOME}/.my.cnf" ]
 then
+    echo "Save root password to /root/.my.cnf file"
     {
     echo "[client]"
     echo "user=root"
@@ -47,6 +53,7 @@ else
     exit
 fi
 
+echo "service mysql start"
 service mysql start
 
 
@@ -102,3 +109,4 @@ unset MYSQL_ROOT_PASSWORD
 echo "MySQL setup completed. Insecure defaults are gone. Please remove" \
      "this script manually when you are done with it (or at least " \
      "remove the MySQL root password that you put inside it."
+     

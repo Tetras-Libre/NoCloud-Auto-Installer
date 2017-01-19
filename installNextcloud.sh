@@ -27,7 +27,7 @@ set -o nounset                              # Treat unset variables as an error
 SCRIPT_DIRECTORY=`pwd`
 . `pwd`/installNextcloud.env
 
-RUNNING_DATE_TIME="`$(date +%Y%m%d%H%M%S)`"
+RUNNING_DATE_TIME="`date +%Y%m%d%H%M%S`"
 
 
 if [ ! -d $NEXTCLOUD_DIRECTORY_SOURCES ]

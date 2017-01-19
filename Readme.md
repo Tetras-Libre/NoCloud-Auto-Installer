@@ -51,10 +51,10 @@ L'installation d'un script spécifique se fait aussi en trois étapes.
 1. Configuration du ENV du script à faire tourner
 2. Exécution de la commande avec le script voulu : 
     * Mysql : ``sh initInstall.sh && sh installMySQL.sh``
-    * Nextcloud : ``sh initInstall.sh && sh installMySQL.sh 
-                    && sh installNextcloud.sh``
-    * Dolibarr : ``sh initInstall.sh && sh installMySQL.sh 
-                    && sh installDolibarr.sh``
+    * Nextcloud :
+      ``sh initInstall.sh && sh installMySQL.sh && sh installNextcloud.sh``
+    * Dolibarr : 
+      ``sh initInstall.sh && sh installMySQL.sh && sh installDolibarr.sh``
     * TetrasBack : ``sh initInstall.sh && sh installTetrasBack.sh``
 3. Faire la post installationd du script
 

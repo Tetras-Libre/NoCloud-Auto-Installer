@@ -47,6 +47,7 @@ DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
     debian-goodies \
     fail2ban \
     libapache2-mod-php5 \
+    ntp \
     php5 \
     php5-apcu \
     php5-curl \

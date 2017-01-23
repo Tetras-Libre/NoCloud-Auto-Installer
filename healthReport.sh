@@ -16,8 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-sendername="David Beniamine"
-recipient="$sendername <david@beniamine.net>"
+recipient="root"
 level=info
 date="$(date +%y%m%d_%H%M)"
 archiveFile="HealthReport-$date.tar.xz"
@@ -155,7 +154,6 @@ $(do_cmd sensors)
 $(do_cmd crontab -l)
 
 Best regards,
-$sendername
 EOF
 }
 
@@ -244,4 +242,4 @@ done
 
 set_level
 create_archive
-generate_mail | /usr/sbin/sendmail -F "$sendername" -t
+generate_mail | /usr/sbin/sendmail -t

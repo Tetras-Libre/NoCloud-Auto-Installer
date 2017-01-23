@@ -1,5 +1,6 @@
 #!/bin/bash
 NEXTCLOUD_INSTALL_DIR=${NEXTCLOUD_INSTALL_DIR:-'/var/www/nextcloud'}
+NEXTCLOUD_INSTALL_DIR=`echo $NEXTCLOUD_INSTALL_DIR | sed 's@/*$@@'`
 htuser=${htuser:-'www-data'}
 ocupdater=${ocupdater:-"$NEXTCLOUD_INSTALL_DIR/updater/updater.phar"}
 occ=$NEXTCLOUD_INSTALL_DIR/occ

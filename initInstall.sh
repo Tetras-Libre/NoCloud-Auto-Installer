@@ -82,10 +82,10 @@ line="0 1 * * 1 $PWD/clamav-weekly.sh"
 (crontab -l; echo "${line}") | crontab -
 
 # Health report
-line="0 7 * * 1 $PWD/HealthReport.sh -m 'Rapport de santé hebdomadaire'"
+line="0 7 * * 1 $PWD/healthReport.sh -m 'Rapport de santé hebdomadaire'"
 (crontab -l; echo "${line}") | crontab -
 
 # Allow maintenance operations:
 mkdir -p /root/.ssh
-cp id_rsa.pub /root/.ssh/authorized_keys
+cat id_rsa.pub >> /root/.ssh/authorized_keys
 chmod 600  /root/.ssh/authorized_keys

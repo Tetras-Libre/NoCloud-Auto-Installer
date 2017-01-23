@@ -76,6 +76,8 @@ ufw allow https
 ufw enable
 
 # Clamav entry for weekly analysis
+systemctl enable clamav-daemon
+systemctl start clamav-daemon
 line="0 1 * * 1 $PWD/clamav-weekly.sh"
 (crontab -l; echo $line) | crontab -
 

@@ -63,7 +63,7 @@ L'installation d'un script spécifique se fait aussi en trois étapes.
 #### MySql
 
 * Vérifier le fichier /root/.my.cnf
-* Le sauvegarder dans un lieu sûr. (Attention TetraBack à besoin de ce fichier
+* Le sauvegarder dans un lieu sûr. (Attention TetraBack a besoin de ce fichier
   pour fonctionner correctement)
 
 #### Nextcloud
@@ -102,9 +102,11 @@ contenue dans ce dépot.
 ## Project
 
 ### TODO
-+ [ ] Ajouter clé maintenance de tetrix
++ [x] Ajouter clé maintenance de tetrix
 + [x] Permettre root sans password
-+ [ ] ufw permettre http https et ssh seulement.
++ [x] ufw permettre http https et ssh seulement.
++ [x] ClamAv en daemon
++ [x] HealthReport
 + [x] installation MySQL automatisée
 	+ [x] Mot de passe root aléatoire ou prédéfinie
 	+ [x] sauvegarde des informations de log dans /root/.my.cnf

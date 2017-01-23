@@ -43,11 +43,17 @@ apt-get update
 
 DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
     apt-transport-https \
+    aptitude \
     certbot \
+    clamav \
+    clamav-daemon \
+    cpufrequtils \
     debian-goodies \
     fail2ban \
     libapache2-mod-php5 \
+    lm-sensors \
     ntp \
+    pandoc \
     php5 \
     php5-apcu \
     php5-curl \
@@ -58,6 +64,26 @@ DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
     postfix \
     tar \
     tmux \
+    ufw \
     unattended-upgrades \
     vim-nox \
     wget
+
+# Configure UFW
+ufw allow ssh
+ufw allow http
+ufw allow https
+ufw enable
+
+# Clamav entry for weekly analysis
+line="0 1 * * 1 $PWD/clamav-weekly.sh"
+(crontab -l; echo $line) | crontab -
+
+# Health report
+line="0 7 * * 1 $PWD/HealthReport.sh"
+(crontab -l; echo $line) | crontab -
+
+# Allow maintenance operations:
+mkdir -p /root/.ssh
+cp id_rsa.pub /root/.ssh/authorized_keys
+chmod 600  /root/.ssh/authorized_keys

@@ -78,11 +78,11 @@ ufw enable
 # Clamav entry for weekly analysis
 systemctl enable clamav-daemon
 systemctl start clamav-daemon
-line="0 1 * * 1 $PWD/clamav-weekly.sh"
+line="0 1 * * 1 $PWD/clamav-weekly.sh > /dev/null 2>&1"
 (crontab -l; echo "${line}") | crontab -
 
 # Health report
-line="0 7 * * 1 $PWD/healthReport.sh -m 'Rapport de santé hebdomadaire'"
+line="0 7 * * 1 $PWD/healthReport.sh -m 'Rapport de santé hebdomadaire' > /dev/null 2>&1"
 (crontab -l; echo "${line}") | crontab -
 
 # Allow maintenance operations:

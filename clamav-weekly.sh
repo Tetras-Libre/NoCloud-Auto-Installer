@@ -1,6 +1,5 @@
 #!/bin/bash
 LOGFILE="/tmp/clamav-$(date +'%Y-%m-%d').log";
-EMAIL_FROM="clamav-daily@tetras-libre.fr";
 EMAIL_TO="root";
 DIRTOSCAN="/var/www /home";
 
@@ -12,7 +11,6 @@ do_sendmail(){
     done < $LOGFILE
     (echo "Subject: [NoCloud ClamAv] $subject";
     echo "To: $EMAIL_TO";
-    echo "From: $EMAIL_FROM"
     echo "Content-Type: text/plain; charset=UTF-8";
     echo "";
     echo -e "${message}") | sendmail -t

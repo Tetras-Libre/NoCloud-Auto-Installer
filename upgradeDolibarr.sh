@@ -1,5 +1,10 @@
 #!/bin/bash
 DIR=`dirname $0`
+if [ -z `dpkg -l | grep dolibarr` ]
+then
+    echo "Dolibarr not installed, aborting"
+    exit 1
+fi
 git pull
 current_version=`apt-cache policy dolibarr | grep Installed | awk '{print $2}'`
 echo "Current version of dolibarr: $current_version"

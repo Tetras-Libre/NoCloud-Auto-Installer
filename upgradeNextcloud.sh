@@ -5,6 +5,11 @@ htuser=${htuser:-'www-data'}
 ocupdater=${ocupdater:-"$NEXTCLOUD_INSTALL_DIR/updater/updater.phar"}
 occ=$NEXTCLOUD_INSTALL_DIR/occ
 APPS=`sudo -u $htuser php $occ app:list | awk 'BEGIN{ok=1} /^Disabled:/{ok=0} {if(ok==1){print $2}}' | sed 's/:$//'`
+if [ ! -d $NEXTCLOUD_INSTALL_DIR ]
+then
+    echo "Nextcloud is not installed, aborting"
+    exit 1
+fi
 echo "Removing old backup"
 rm -rf $NEXTCLOUD_INSTALL_DIR.bak
 echo "backing up nextcloud"

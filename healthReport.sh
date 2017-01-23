@@ -25,7 +25,7 @@ logdir="/var/log"
 alertfiles="$logdir/mysql.log $logdir/faillog \
     $logdir/daemon.log $logdir/auth.log $logdir/kern.log"
 # Log files to always include
-files="$logdir/bckp.log $logdir/updatedns.log $logdir/fail2ban.log"
+files="$logdir/fail2ban.log"
 # No need for an actual random number as we know this sentence will never
 # appear in the mail
 BOUNDARY="unique-boundary-42"

@@ -1,6 +1,6 @@
 #!/bin/bash
 # from  https://doc.owncloud.org/server/9.0/admin_manual/installation/installation_wizard.html?highlight=trusted#trusted-domains
-ocpath=${ocpath:-'/var/www/nextcloud'}
+NEXTCLOUD_INSTALL_DIR=${NEXTCLOUD_INSTALL_DIR:-'/var/www/nextcloud'}
 htuser=${htuser:-'www-data'}
 htgroup=${htgroup:-'www-data'}
 rootuser=${rootuser:-'root'}
@@ -15,24 +15,24 @@ then
 fi
 
 printf "chmod Files and Directories\n"
-find ${ocpath%/}/ -type f -print0 | xargs -0 chmod 0640
-find ${ocpath%/}/ -type d -print0 | xargs -0 chmod 0750
+find ${NEXTCLOUD_INSTALL_DIR%/}/ -type f -print0 | xargs -0 chmod 0640
+find ${NEXTCLOUD_INSTALL_DIR%/}/ -type d -print0 | xargs -0 chmod 0750
 
 printf "chown oc Directories\n"
-chown -R ${rootuser}:${htgroup} ${ocpath%/}/
-chown -R ${htuser}:${htgroup} ${ocpath%/}/apps/
-#chown -R ${htuser}:${htgroup} ${ocpath%/}/apps2/
-chown -R ${htuser}:${htgroup} ${ocpath%/}/config/
+chown -R ${rootuser}:${htgroup} ${NEXTCLOUD_INSTALL_DIR%/}/
+chown -R ${htuser}:${htgroup} ${NEXTCLOUD_INSTALL_DIR%/}/apps/
+#chown -R ${htuser}:${htgroup} ${NEXTCLOUD_INSTALL_DIR%/}/apps2/
+chown -R ${htuser}:${htgroup} ${NEXTCLOUD_INSTALL_DIR%/}/config/
 chown -R ${htuser}:${htgroup} ${datapath%/}/
-chown -R ${htuser}:${htgroup} ${ocpath%/}/themes/
+chown -R ${htuser}:${htgroup} ${NEXTCLOUD_INSTALL_DIR%/}/themes/
 
-chmod +x ${ocpath%/}/occ
+chmod +x ${NEXTCLOUD_INSTALL_DIR%/}/occ
 
 printf "chmod/chown .htaccess\n"
-if [ -f ${ocpath%/}/.htaccess ]
+if [ -f ${NEXTCLOUD_INSTALL_DIR%/}/.htaccess ]
 then
-    chmod 0644 ${ocpath%/}/.htaccess
-    chown ${rootuser}:${htgroup} ${ocpath%/}/.htaccess
+    chmod 0644 ${NEXTCLOUD_INSTALL_DIR%/}/.htaccess
+    chown ${rootuser}:${htgroup} ${NEXTCLOUD_INSTALL_DIR%/}/.htaccess
 fi
 if [ -f ${datapath}/.htaccess ]
 then

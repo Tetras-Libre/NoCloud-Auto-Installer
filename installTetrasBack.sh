@@ -23,12 +23,12 @@ DEBIAN_FRONTEND="noninteractive" apt-get -qq install git gnulib perl sendmail \
 
 OriginalDirectory=`pwd`
 
+cd `dirname $0`
 git clone https://gitlab.tetras-libre.fr/tetras-libre/Tetras-back.git
 cd Tetras-back
 export DEBIAN_FRONTEND="noninteractive"
 make dependencies
 make
-make config
 unset DEBIAN_FRONTEND
 
 cd $OriginalDirectory

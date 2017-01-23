@@ -79,6 +79,26 @@ L'installation d'un script spécifique se fait aussi en trois étapes.
 
 * Installation a partir du dépot de Tétras-Libre
 
+## Mises à jour
+
+Le script `upgradeAll.sh`, met à jour tous les logiciels installés via cet
+installer.
+
+### Nextcloud
+
+Le script `upgradeNextcloud.sh` met nextcloud à jour depuis la dernière version
+stable depuis les dépots nextcloud.
+
+### Tetras-back
+
+Le script `upgradeTetras-back.sh` met Tetras-Back à jour en clonant la version
+dans le gitlab tetras-libre.
+
+### Dolibarr
+
+Le script `upgradeDolibarr.sh` met Dolibarr à jour depuis la version deb
+contenue dans ce dépot.
+
 ## Project
 
 ### TODO

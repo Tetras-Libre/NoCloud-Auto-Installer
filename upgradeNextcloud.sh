@@ -1,17 +1,17 @@
 #!/bin/bash
-ocpath=${ocpath:-'/var/www/nextcloud'}
+NEXTCLOUD_INSTALL_DIR=${NEXTCLOUD_INSTALL_DIR:-'/var/www/nextcloud'}
 htuser=${htuser:-'www-data'}
-ocupdater=${ocupdater:-"$ocpath/updater/updater.phar"}
-occ=$ocpath/occ
+ocupdater=${ocupdater:-"$NEXTCLOUD_INSTALL_DIR/updater/updater.phar"}
+occ=$NEXTCLOUD_INSTALL_DIR/occ
 APPS=`sudo -u $htuser php $occ app:list | awk 'BEGIN{ok=1} /^Disabled:/{ok=0} {if(ok==1){print $2}}' | sed 's/:$//'`
 echo "Removing old backup"
-rm -rf $ocpath.bak
+rm -rf $NEXTCLOUD_INSTALL_DIR.bak
 echo "backing up nextcloud"
-cp -r $ocpath $ocpath.bak
+cp -r $NEXTCLOUD_INSTALL_DIR $NEXTCLOUD_INSTALL_DIR.bak
 echo "Entering maintenance mode"
 sudo -u $htuser php $occ maintenance:mode --on
 echo "Giving all permissions to $htuser"
-chown -R $htuser: $ocpath
+chown -R $htuser: $NEXTCLOUD_INSTALL_DIR
 sudo -u $htuser php $ocupdater --no-interaction --verbose
 sudo -u $htuser php $occ maintenance:mode --off
 

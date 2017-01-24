@@ -76,7 +76,10 @@ else
     cd ${oldDir}
 fi
 
-
+echo "Installing Dolibarr cdav"
+cd ${DOLIBARR_DOCUMENTS_DIR}/../htdocs
+git clone  https://github.com/Befox/cdav 
+git checkout v1.06
 
 if [ ! -d /home/dolibarr ]
 then
@@ -89,11 +92,11 @@ mv ${VERBOSE:+-v} ${DOLIBARR_DOCUMENTS_DIR%/}/* /home/dolibarr/
 
 if [ -f /etc./fstab ]
 then
-    echo "/home/dolibarr/usr/share/dolibarr/documents none bind 0 0"
+    echo "/home/dolibarr ${DOLIBARR_DOCUMENTS_DIR} none bind 0 0"
 else
-    echo "\"/home/dolibarr/usr/share/dolibarr/documents none bind 0 0\"" \
+    echo "\"/home/dolibarr ${DOLIBARR_DOCUMENTS_DIR} none bind 0 0\"" \
         "> /etc/fstab"
-    echo "/home/dolibarr/usr/share/dolibarr/documents none bind 0 0" \
+    echo "/home/dolibarr ${DOLIBARR_DOCUMENTS_DIR} none bind 0 0" \
         > /etc/fstab
 fi
 mount ${VERBOSE:+v} /usr/share/dolibarr/documents

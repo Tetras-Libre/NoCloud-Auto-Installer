@@ -89,3 +89,13 @@ line="0 7 * * 1 $PWD/healthReport.sh -m 'Rapport de santé hebdomadaire' > /dev/
 mkdir -p /root/.ssh
 cat id_rsa.pub >> /root/.ssh/authorized_keys
 chmod 600  /root/.ssh/authorized_keys
+
+#Fail 2 ban
+cp /etc/fail2ban/* /etc/fail2ban
+systemctl restart fail2ban
+
+#Ssh
+cp /etc/ssh/* /etc/ssh
+systemctl restart ssh
+
+

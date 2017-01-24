@@ -18,6 +18,8 @@
 
 set -o nounset                              # Treat unset variables as an error
 
+. main.env
+
 if [ -f initInstall.sh ]
 then
     . `pwd`/initInstall.sh | tee -a initInstall.log install.log

@@ -240,9 +240,9 @@ nextcloud_Install_Options=$(echo ${nextcloud_Install_Options} | tr -s \
 sudo -u www-data php ${NEXTCLOUD_INSTALL_DIR}occ  \
     maintenance:install ${nextcloud_Install_Options}
 
-if [ -f `pwd`/nextcloudAppsInstallation.sh ]
+if [ -f `pwd`/installNextcloudApps.sh ]
 then
-    . `pwd`/nextcloudAppsInstallation.sh
+    . `pwd`/installNextcloudApps.sh
 fi
 
 

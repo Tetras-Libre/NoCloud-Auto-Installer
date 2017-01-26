@@ -5,7 +5,7 @@ default:
 	echo "make tarball"
 
 tarball : initInstall.sh installMySQL.sh installNextcloud.env \
-	installNextcloud.sh nextcloudAppsIntallation.sh run.sh \
+	installNextcloud.sh installNextcloudApps.sh run.sh \
 	nextcloudStrongDirectoryPermissions.sh
 	mkdir NoCloud-Auto-Installer
 	cp -r *.sh *.env *.conf DOLIBARR_PACKAGES NoCloud-Auto-Installer

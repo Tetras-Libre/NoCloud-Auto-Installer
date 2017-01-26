@@ -20,27 +20,12 @@ set -o nounset                              # Treat unset variables as an error
 
 . main.env
 
-if [ -f initInstall.sh ]
-then
-    . `pwd`/initInstall.sh | tee -a initInstall.log install.log
-fi
+MODS="initInstall installMySQL installNextcloud installDolibarr installTetrasBack"
 
-if [ -f installMySQL.sh ]
-then
-    . `pwd`/installMySQL.sh | tee -a installMySQL.sh install.log
-fi
-
-if [ -f installNextcloud.sh ]
-then
-    . `pwd`/installNextcloud.sh | tee -a installNexcloud.sh install.log
-fi
-
-if [ -f installDolibarr.sh ]
-then
-    . `pwd`/installDolibarr.sh | tee -a installDolibarr.sh install.log
-fi
-
-if [ -f installTetrasBack.sh ]
-then
-    . `pwd`/installTetrasBack.sh | tee -a installTetrasBack.sh install.log
-fi
+for mod in $MODS
+do
+    if [ -f $mod.sh ]
+    then
+        . `pwd`/$mod.sh | tee -a $mod.log install.log
+    fi
+done

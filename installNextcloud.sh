@@ -302,17 +302,14 @@ echo "a2enmod ssl"
 a2enmod ssl
 echo "a2enmod ssl : terminated"
 
+# activation ssl
+a2enmod ssl
+a2ensite default-ssl
+
 echo "service apache2 restart"
 service apache2 restart
-echo "service apache2 restart : terminated"
-echo "WARNING : apache ssl isn't activated => to activate it : run following" \
-     "command : " \
-     "a2enmod ssl; a2ensite default-ssl; service apache2 reload"
 
-# activation ssl
-#a2enmod ssl
-#a2ensite default-ssl
-#service apache2 reload
+echo "Warning: ssl isn't properly activated, please run certbot then uncomment the contents of /etc/apache2/ssl.conf"
 
 echo "crontab -u www-data -e" \
     "*/15  *  *  *  * php -f ${NEXTCLOUD_INSTALL_DIR}cron.php"

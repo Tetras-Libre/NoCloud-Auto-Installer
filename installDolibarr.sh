@@ -28,6 +28,7 @@ DOLIBARR_PKG_NAME=${DOLIBARR_PKG_NAME:-dolibarr_4.0.3-4_all.deb}
 SCRIPT_DIRECTORY=`pwd`
 DOLIBARR_LOGFILE="${SCRIPT_DIRECTORY%%/}/installDolibarr.log"
 RUNNING_DATE_TIME="$(date +%Y%m%d%H%M%S)"
+DOLIBARR_CONFIG_ServerName=${DOLIBARR_CONFIG_ServerName:-dolibarr.${DOMAIN}}
 
 if [ ${VERBOSE:-0} -ne 0 ]
 then
@@ -138,15 +139,7 @@ sed \
         ${SCRIPT_DIRECTORY%%/}/template_ssl.conf > \
         /etc/apache2/ssl.conf
 
-echo "#######################################################################"
-echo "WARNING : new configuration file for dolibarr is installed in" \
-    "/etc/apache2/sites-available/"
-echo "before any activation of the website, check it then" \
-    "use the following command :"
-echo "ln -s /etc/apache2/sites-available/dolibarr-ssl.conf" \
-    "/etc/apache2/sites-enabled/dolibarr-ssl.conf"
-echo "Take a look at /etc/apache2/ssl.conf to check configuration state"
-echo "#######################################################################"
+a2ensite dolibarr-ssl.conf
 
 echo "cd ${SCRIPT_DIRECTORY}"
 cd ${SCRIPT_DIRECTORY}

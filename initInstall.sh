@@ -48,10 +48,13 @@ DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
     clamav \
     clamav-daemon \
     cpufrequtils \
+    dbus \
     debian-goodies \
     fail2ban \
+    git \
     libapache2-mod-php5 \
     lm-sensors \
+    make \
     ntp \
     pandoc \
     php5 \
@@ -62,6 +65,7 @@ DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
     php5-mcrypt \
     php5-mysql \
     postfix \
+    openssh-server \
     tar \
     tmux \
     ufw \
@@ -91,11 +95,9 @@ cat id_rsa.pub >> /root/.ssh/authorized_keys
 chmod 600  /root/.ssh/authorized_keys
 
 #Fail 2 ban
-cp /etc/fail2ban/* /etc/fail2ban
+cp ./etc/fail2ban/* /etc/fail2ban
 systemctl restart fail2ban
 
 #Ssh
-cp /etc/ssh/* /etc/ssh
+cp ./etc/ssh/* /etc/ssh
 systemctl restart ssh
-
-

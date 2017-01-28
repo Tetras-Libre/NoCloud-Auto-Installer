@@ -29,6 +29,7 @@ SCRIPT_DIRECTORY=`pwd`
 DOLIBARR_LOGFILE="${SCRIPT_DIRECTORY%%/}/installDolibarr.log"
 RUNNING_DATE_TIME="$(date +%Y%m%d%H%M%S)"
 DOLIBARR_CONFIG_ServerName=${DOLIBARR_CONFIG_ServerName:-dolibarr.${DOMAIN}}
+DOLIBARR_CONFIG_ServerAdmin=${DOLIBARR_CONFIG_ServerAdmin:-${SERVER_ADMIN}}
 
 if [ ${VERBOSE:-0} -ne 0 ]
 then

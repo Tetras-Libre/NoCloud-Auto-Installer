@@ -307,8 +307,8 @@ echo "a2enmod ssl : terminated"
 a2enmod ssl
 a2ensite nextcloud-ssl
 
-echo "service apache2 restart"
-service apache2 restart
+echo "apachectl restart"
+apachectl configtest && apachectl restart || echo "Failed restartin apache"
 
 echo "Warning: ssl isn't properly activated, please run certbot then uncomment the contents of /etc/apache2/ssl.conf"
 

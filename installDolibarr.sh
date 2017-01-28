@@ -140,6 +140,7 @@ sed \
         /etc/apache2/ssl.conf
 
 a2ensite dolibarr-ssl.conf
+apachectl configtest && apachectl restart || echo "Failed restartin apache"
 
 echo "cd ${SCRIPT_DIRECTORY}"
 cd ${SCRIPT_DIRECTORY}

@@ -111,6 +111,8 @@ bzip2 -d ${NEXTCLOUD_PACKAGE}
 tar xf ${NEXTCLOUD_VERSION}.tar
 cp -r nextcloud $(dirname ${NEXTCLOUD_INSTALL_DIR%/})
 chown -R www-data:www-data ${NEXTCLOUD_INSTALL_DIR}
+mkdir -p ${NEXTCLOUD_DATA_DIR}
+chown -R www-data:www-data ${NEXTCLOUD_DATA_DIR}
 
 echo "Check Nextcloud is not installed"
 LC_ALL="en_US.utf-8" sudo -u www-data php ${NEXTCLOUD_INSTALL_DIR}occ -V | grep -q "Nextcloud is not installed"
@@ -240,16 +242,15 @@ nextcloud_Install_Options=$(echo ${nextcloud_Install_Options} | tr -s \
 sudo -u www-data php ${NEXTCLOUD_INSTALL_DIR}occ  \
     maintenance:install ${nextcloud_Install_Options}
 
-if [ -f `pwd`/installNextcloudApps.sh ]
-then
-    . `pwd`/installNextcloudApps.sh
-fi
-
-
 # remove all downloaded files
 cd ..
 rm -r $NEXTCLOUD_DIRECTORY_SOURCES
 cd ${SCRIPT_DIRECTORY}
+
+if [ -f `pwd`/installNextcloudApps.sh ]
+then
+    . `pwd`/installNextcloudApps.sh
+fi
 
 . `pwd`/nextcloudStrongDirectoryPermissions.sh
 
@@ -259,9 +260,9 @@ then
         /etc/apache2/${RUNNING_DATE_TIME}_nextcloud-ssl.conf
 fi
 
-if [ -f /etc/apache2/ssl.conf ]
+if [ -f /etc/apache2/sites-available/ssl.conf ]
 then
-    cp /etc/apache2/ssl.conf /etc/apache2/${RUNNING_DATE_TIME}_ssl.conf
+    cp /etc/apache2/sites-available/ssl.conf /etc/apache2/sites-available/${RUNNING_DATE_TIME}_ssl.conf
 fi
 
 # Configure Apache for nextcloud
@@ -304,19 +305,17 @@ echo "a2enmod ssl : terminated"
 
 # activation ssl
 a2enmod ssl
-a2ensite default-ssl
+a2ensite nextcloud-ssl
 
 echo "service apache2 restart"
 service apache2 restart
 
 echo "Warning: ssl isn't properly activated, please run certbot then uncomment the contents of /etc/apache2/ssl.conf"
 
-echo "crontab -u www-data -e" \
-    "*/15  *  *  *  * php -f ${NEXTCLOUD_INSTALL_DIR}cron.php"
-crontab -u www-data -e \
-    */15  *  *  *  * php -f ${NEXTCLOUD_INSTALL_DIR}cron.php
-echo "crontab -u www-data -e" \
-    "*/15  *  *  *  * php -f ${NEXTCLOUD_INSTALL_DIR}cron.php : terminated"
+line="*/15  *  *  *  * php -f ${NEXTCLOUD_INSTALL_DIR}cron.php"
+echo "Adding crontab entry '$line' to www-data"
+(crontab -u www-data -l; echo "${line}") | crontab -u www-data -
+echo "Adding crontab entry '$line' to www-data, done"
 
 
 # Configure config.php

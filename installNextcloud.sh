@@ -164,7 +164,7 @@ nextcloudPassword=${NEXTCLOUD_DATABASE_PASS:-"$(apg -q -a 0 -n 1 -m 21 -M NCL)"}
     echo "password=${nextcloudPassword}"
 } > ${HOME}/.nextcloud.my.cnf
 chmod 600 ${HOME}/.nextcloud.my.cnf
-echo "nextloud user password store in ${home}/.nextcloud.my.cnf only" \
+echo "nextloud user password store in ${HOME}/.nextcloud.my.cnf only" \
     "readable by the root user"
 
 

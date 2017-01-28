@@ -53,7 +53,7 @@ then
 fi
 sed "s@<+ServerAdmin+>@${DOLIBARR_CONFIG_ServerAdmin:-<+ServerAdmin+>}@;
     s@<+ServerName+>@${DOLIBARR_CONFIG_ServerName:-<+ServerName+>}@" \
-        ${SCRIPT_DIRECTORY%%/}/template_tetras-back-ssl.conf > \
+        `pwd`/template_tetras-back-ssl.conf > \
     /etc/apache2/sites-available/tetras-back-ssl.conf
 
 # Set ssl.conf

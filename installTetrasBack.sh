@@ -25,7 +25,7 @@ set -o nounset                              # Treat unset variables as an error
 DEBIAN_FRONTEND="noninteractive" apt-get -qq install git gnulib perl sendmail \
     udev systemd
 
-OriginalDirectory=`pwd`
+SCRIPT_DIRECTORY=`pwd`
 
 cd `dirname $0`
 git clone https://gitlab.tetras-libre.fr/tetras-libre/Tetras-back.git
@@ -35,7 +35,7 @@ make dependencies
 make
 unset DEBIAN_FRONTEND
 
-cd $OriginalDirectory
+cd $SCRIPT_DIRECTORY
 
 echo "Set tetras-back's configuration file for apache 2"
 

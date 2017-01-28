@@ -18,7 +18,7 @@
 
 set -o nounset                              # Treat unset variables as an error
 
-. main.env
+. `pwd`/main.env
 
 MODS="initInstall installMySQL installNextcloud installDolibarr installTetrasBack"
 

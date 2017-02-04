@@ -29,7 +29,8 @@ SCRIPT_LOG="${SCRIPT_DIRECTORY%%/}/installMySQL.log"
 # If mysql not installed then install it
 echo "DEBIAN_FRONTEND='noninteractive' apt-get -qq install mysql-server" \
     "apg expect"
-DEBIAN_FRONTEND='noninteractive' apt-get -qq install mysql-server \
+DEBIAN_FRONTEND='noninteractive' apt-get update \
+    DEBIAN_FRONTEND='noninteractive' apt-get -qq install mysql-server \
     apg expect
 
 MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-$(apg -q -a 0 -n 1 -m 21 -M NCL)}

@@ -37,7 +37,8 @@ fi
 
 cd $NEXTCLOUD_DIRECTORY_SOURCES
 # 1. Download Nexcloud Package
-DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
+DEBIAN_FRONTEND='noninteractive' apt-get update \
+    DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
     apache2 \
     apg \
     bzip2 \

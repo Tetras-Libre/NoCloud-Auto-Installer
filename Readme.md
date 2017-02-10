@@ -1,3 +1,6 @@
+Ce dépôt est un mirroir uniquement, les rapport d'erreur se font sur [le
+gitlab de Tetras Libre](https://gitlab.tetras-libre.fr/tetras-libre/NoCloud-Auto-Installer)
+
 # NoCloud Auto Installer
 
 NoCloud-Auto-Installer est conçu pour installer automatiquement l'ensemble des

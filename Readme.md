@@ -116,3 +116,7 @@ contenue dans ce dépot.
 	+ [x] Variables de spécialisation installation Nextcloud
 + [x] Installation Dolibarr
 + [x] Installation TetrasBack
+
+## Licence
+
+This program is distributed under GPLV3 Licence, see `Licence.txt`

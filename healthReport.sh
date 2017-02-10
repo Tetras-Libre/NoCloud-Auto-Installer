@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Copyright (C) 2015  Beniamine, David <David@Beniamine.net>
-# Author: Beniamine, David <David@Beniamine.net>
+# Copyright (C) 2017  Tetras Libre <admin@tetras-libre.fr>
+# Author: Beniamine, David <David.Beniamine@tetras-libre.fr>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 DIR=`dirname $0`
-if [ -z `dpkg -l | grep dolibarr` ]
+if [ -z "`dpkg -l | grep dolibarr`" ]
 then
     echo "Dolibarr not installed, aborting"
     exit 1
@@ -27,7 +27,7 @@ current_version=`apt-cache policy dolibarr | grep Installed | awk '{print $2}'`
 echo "Current version of dolibarr: $current_version"
 package=`/bin/ls DOLIBARR_PACKAGES/*.deb`
 last_repo_version=`echo $package | sed 's/.*dolibarr_\([^_]*\)_.*/\1/'`
-echo "Version of dolibarri on our repo: $current_version"
+echo "Version of dolibarri on our repo: $last_repo_version"
 if [ "$current_version" == "$last_repo_version" ]
 then
 echo "Current version of dolibarr is the last version in our repo, nothing to do"
@@ -37,5 +37,6 @@ echo "Installing $package"
 dpkg -i $package
 echo "Fixing dependencies"
 apt-get -f install
-echo "You should now be running Dolibarr version $current_version"
-echo "Please check Dolibar webpage for possible manual upgrade steps"
+rm /usr/share/dolibarr/documents/install.lock
+echo "One final step is required to upgrade to Dolibarr $last_repo_version:"
+echo "Please go to your Dolibarr page and run the manual upgrade step"

@@ -37,6 +37,8 @@ echo "Giving all permissions to $htuser"
 chown -R $htuser: $NEXTCLOUD_INSTALL_DIR
 sudo -u $htuser php $ocupdater --no-interaction --verbose
 sudo -u $htuser php $occ maintenance:mode --off
+echo "Removing backup htaccess file"
+rm $NEXTCLOUD_INSTALL_DIR/.htaccess.bak
 
 . `dirname $0`/nextcloudStrongDirectoryPermissions.sh
 FAILED=""

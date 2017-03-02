@@ -101,3 +101,7 @@ systemctl restart fail2ban
 #Ssh
 cp ./etc/ssh/* /etc/ssh
 systemctl restart ssh
+
+#eth0
+echo -e "auto eth0\nallow-hotplug eth0\niface eth0 inet dhcp" \
+    >> /etc/network/interface

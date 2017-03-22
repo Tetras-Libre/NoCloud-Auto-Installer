@@ -157,27 +157,17 @@ mysql -e 'CREATE DATABASE nextcloud CHARACTER
 SET = "utf8mb4" COLLATE = "utf8mb4_general_ci";'
 echo "Nextcloud database created"
 
-echo "Create nextcloud Password for nextcloud database"
 nextcloudPassword=${NEXTCLOUD_DATABASE_PASS:-"$(apg -q -a 0 -n 1 -m 21 -M NCL)"}
-{
-    echo "[client]"
-    echo "user=nextcloud"
-    echo "password=${nextcloudPassword}"
-} > ${HOME}/.nextcloud.my.cnf
-chmod 600 ${HOME}/.nextcloud.my.cnf
-echo "nextloud user password store in ${HOME}/.nextcloud.my.cnf only" \
-    "readable by the root user"
 
-
-echo "Create admin Password for nextcloud database"
+echo "Create admin Password for nextcloud"
 adminPassword=${NEXTCLOUD_ADMIN_PASS=-"$(apg -q -a 0 -n 1 -m 21 -M NCL)"}
 {
-    echo "[client]"
+    echo "[nextcloud]"
     echo "user=admin"
     echo "password=${adminPassword}"
-} > ${HOME}/.adminNextcloud.my.cnf
-chmod 600 ${HOME}/.adminNextcloud.my.cnf
-echo "amdin user password store in ${home}/.admin.my.cnf only" \
+} >> ${HOME}/.passwords
+chmod 600 ${HOME}/.passwords
+echo "amdin user password store in ${HOME}/.passwords only" \
     "readable by the root user"
 
 echo "Set nextcloud user for nextcloud@localhost in database"

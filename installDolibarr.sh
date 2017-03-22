@@ -143,5 +143,54 @@ sed \
 a2ensite dolibarr-ssl.conf
 apachectl configtest && apachectl restart || echo "Failed restartin apache"
 
+# Create dolibar database in mysql
+echo "create dolibarr database"
+echo "mysql -e 'CREATE DATABASE dolibarr;'"
+mysql -e 'CREATE DATABASE dolibarr;'
+echo "Dolibarr database created"
+
+echo "Create dolibarr Password for dolibarr database"
+dolibarrPassword=${NEXTCLOUD_DATABASE_PASS:-"$(apg -q -a 0 -n 1 -m 21 -M NCL)"}
+
+echo "Create admin Password for dolibarr"
+adminPassword=${NEXTCLOUD_ADMIN_PASS=-"$(apg -q -a 0 -n 1 -m 21 -M NCL)"}
+{
+    echo "[dolibarr]"
+    echo "user=admin"
+    echo "password=${adminPassword}"
+} >> ${HOME}/.passwords
+chmod 600 ${HOME}/.passwords
+echo "amdin user password store in ${HOME}/.passwords only" \
+    "readable by the root user"
+
+echo "Set dolibarr user for dolibarr@localhost in database"
+mysql -e "CREATE USER 'dolibarr'@'localhost' IDENTIFIED BY
+'${dolibarrPassword}';"
+if [ $? -eq 0 ]
+then
+    echo "dolibarr user set for dolibarr@localhost in database"
+else
+    echo "error processing : $?" >&2
+fi
+
+echo "Grant all privileges to nexcloud user to dolibarr database"
+mysql -e "GRANT ALL PRIVILEGES on dolibarr.* to
+'dolibarr'@'localhost' IDENTIFIED BY '${dolibarrPassword}';
+FLUSH PRIVILEGES;";
+if [ $? -eq 0 ]
+then
+    echo "Privileges granted"
+else
+    echo "Error processing : $?" >&2
+fi
+
+{
+    echo "[dolibarr-mysql]"
+    echo "user=dolibarr"
+    echo "password=${dolibarrPassword}"
+} >> ${HOME}/.passwords
+
 echo "cd ${SCRIPT_DIRECTORY}"
 cd ${SCRIPT_DIRECTORY}
+
+

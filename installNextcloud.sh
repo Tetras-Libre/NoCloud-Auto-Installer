@@ -313,7 +313,7 @@ apachectl configtest && apachectl restart || echo "Failed restartin apache"
 
 echo "Warning: ssl isn't properly activated, please run certbot then uncomment the contents of /etc/apache2/ssl.conf"
 
-line="*/15  *  *  *  * php -f ${NEXTCLOUD_INSTALL_DIR}cron.php"
+line="*/15  *  *  *  * php -f ${NEXTCLOUD_INSTALL_DIR}/cron.php"
 echo "Adding crontab entry '$line' to www-data"
 (crontab -u www-data -l; echo "${line}") | crontab -u www-data -
 echo "Adding crontab entry '$line' to www-data, done"
@@ -321,9 +321,9 @@ echo "Adding crontab entry '$line' to www-data, done"
 
 # Configure config.php
 
-echo "cd ${NEXTCLOUD_INSTALL_DIR}config"
-cd ${NEXTCLOUD_INSTALL_DIR}config
-echo "cd ${NEXTCLOUD_INSTALL_DIR}config : terminated"
+echo "cd ${NEXTCLOUD_INSTALL_DIR}/config"
+cd ${NEXTCLOUD_INSTALL_DIR}/config
+echo "cd ${NEXTCLOUD_INSTALL_DIR}/config : terminated"
 
 sections=${NEXTCLOUD_CONFIG_trusted_domains:-\
     "${NEXTCLOUD_CONFIG_trusted_domains}"}

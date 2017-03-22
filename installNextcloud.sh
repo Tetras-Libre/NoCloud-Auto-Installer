@@ -317,13 +317,14 @@ echo "cd ${NEXTCLOUD_INSTALL_DIR}/config : terminated"
 
 sections=${NEXTCLOUD_CONFIG_trusted_domains:-\
     "${NEXTCLOUD_CONFIG_trusted_domains}"}
-sections="${sections} 'memcache.local' => 'OC\\Memcache\\APCu',"
+sections="${sections} 'memcache.local' => 'APCu',"
 # sections=$(echo $sections | tr -s '[:space:]' ' ')
 
 echo "Set /var/www/nexcloud/config/config.php"
-sed -i.bak "/'trusted_domains'/,/),/d;
+sed -i.bak -e "/'trusted_domains'/,/),/d;
 s@)@${sections})@;
-/array(/s@,@,\n@g;" `pwd`/config.php
+/array(/s@,@,\n@g;" \
+    -e 's/APCu/OC\\\\Memcache\\\\APCu/' `pwd`/config.php
 
 echo "sed -i.bak \"/'trusted_domains'/,/),/d;" \
      "s@)@${sections})@;" \

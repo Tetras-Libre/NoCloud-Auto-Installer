@@ -38,7 +38,7 @@ fi
 cd $NEXTCLOUD_DIRECTORY_SOURCES
 # 1. Download Nexcloud Package
 DEBIAN_FRONTEND='noninteractive' apt-get update \
-    DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
+    && DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
     apache2 \
     apg \
     bzip2 \
@@ -157,27 +157,17 @@ mysql -e 'CREATE DATABASE nextcloud CHARACTER
 SET = "utf8mb4" COLLATE = "utf8mb4_general_ci";'
 echo "Nextcloud database created"
 
-echo "Create nextcloud Password for nextcloud database"
 nextcloudPassword=${NEXTCLOUD_DATABASE_PASS:-"$(apg -q -a 0 -n 1 -m 21 -M NCL)"}
-{
-    echo "[client]"
-    echo "user=nextcloud"
-    echo "password=${nextcloudPassword}"
-} > ${HOME}/.nextcloud.my.cnf
-chmod 600 ${HOME}/.nextcloud.my.cnf
-echo "nextloud user password store in ${HOME}/.nextcloud.my.cnf only" \
-    "readable by the root user"
 
-
-echo "Create admin Password for nextcloud database"
+echo "Create admin Password for nextcloud"
 adminPassword=${NEXTCLOUD_ADMIN_PASS=-"$(apg -q -a 0 -n 1 -m 21 -M NCL)"}
 {
-    echo "[client]"
+    echo "[nextcloud]"
     echo "user=admin"
     echo "password=${adminPassword}"
-} > ${HOME}/.adminNextcloud.my.cnf
-chmod 600 ${HOME}/.adminNextcloud.my.cnf
-echo "amdin user password store in ${home}/.admin.my.cnf only" \
+} >> ${HOME}/.passwords
+chmod 600 ${HOME}/.passwords
+echo "amdin user password store in ${HOME}/.passwords only" \
     "readable by the root user"
 
 echo "Set nextcloud user for nextcloud@localhost in database"
@@ -269,8 +259,8 @@ fi
 # Configure Apache for nextcloud
 echo "Configure Apache nextcloud-ssl.conf"
 sed \
-    "s@<+NEXTCLOUD_CONFIG_ServerAdmin+>@${NEXTCLOUD_CONFIG_ServerAdmin}@
-    s@<+NEXTCLOUD_CONFIG_ServerName+>@${NEXTCLOUD_CONFIG_ServerName}@" \
+    "s/<+NEXTCLOUD_CONFIG_ServerAdmin+>/${NEXTCLOUD_CONFIG_ServerAdmin}/;
+    s/<+NEXTCLOUD_CONFIG_ServerName+>/${NEXTCLOUD_CONFIG_ServerName}/" \
 `pwd`/template_nextcloud-ssl.conf > \
     /etc/apache2/sites-available/nextcloud-ssl.conf
 
@@ -313,7 +303,7 @@ apachectl configtest && apachectl restart || echo "Failed restartin apache"
 
 echo "Warning: ssl isn't properly activated, please run certbot then uncomment the contents of /etc/apache2/ssl.conf"
 
-line="*/15  *  *  *  * php -f ${NEXTCLOUD_INSTALL_DIR}cron.php"
+line="*/15  *  *  *  * php -f ${NEXTCLOUD_INSTALL_DIR}/cron.php"
 echo "Adding crontab entry '$line' to www-data"
 (crontab -u www-data -l; echo "${line}") | crontab -u www-data -
 echo "Adding crontab entry '$line' to www-data, done"
@@ -321,25 +311,24 @@ echo "Adding crontab entry '$line' to www-data, done"
 
 # Configure config.php
 
-echo "cd ${NEXTCLOUD_INSTALL_DIR}config"
-cd ${NEXTCLOUD_INSTALL_DIR}config
-echo "cd ${NEXTCLOUD_INSTALL_DIR}config : terminated"
+echo "cd ${NEXTCLOUD_INSTALL_DIR}/config"
+cd ${NEXTCLOUD_INSTALL_DIR}/config
+echo "cd ${NEXTCLOUD_INSTALL_DIR}/config : terminated"
 
 sections=${NEXTCLOUD_CONFIG_trusted_domains:-\
     "${NEXTCLOUD_CONFIG_trusted_domains}"}
-sections="${sections} 'memcache.local' => 'OC\\Memcache\\APCu',"
+sections="${sections} 'memcache.local' => 'APCu',"
 # sections=$(echo $sections | tr -s '[:space:]' ' ')
 
 echo "Set /var/www/nexcloud/config/config.php"
-sed -i.bak "/'trusted_domains'/,/),/d;
+sed -i.bak -e "/'trusted_domains'/,/),/d;
 s@)@${sections})@;
-/array(/s@,@,\n@g;
-s@^\(\S\)@  \1@g;" `pwd`/config.php
+/array(/s@,@,\n@g;" \
+    -e 's/APCu/OC\\\\Memcache\\\\APCu/' `pwd`/config.php
 
 echo "sed -i.bak \"/'trusted_domains'/,/),/d;" \
      "s@)@${sections})@;" \
-     "/array(/s@,@,\n@g;" \
-     "s@^\(\S\)@  \1@g;\" `pwd`/config.php : terminated"
+     "/array(/s@,@,\n@;\" `pwd`/config.php : terminated"
 echo "WARNING : Take a look at /var/www/nexcloud/config/config.php"
 
 cd ${SCRIPT_DIRECTORY}

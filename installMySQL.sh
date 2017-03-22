@@ -30,7 +30,7 @@ SCRIPT_LOG="${SCRIPT_DIRECTORY%%/}/installMySQL.log"
 echo "DEBIAN_FRONTEND='noninteractive' apt-get -qq install mysql-server" \
     "apg expect"
 DEBIAN_FRONTEND='noninteractive' apt-get update \
-    DEBIAN_FRONTEND='noninteractive' apt-get -qq install mysql-server \
+    && DEBIAN_FRONTEND='noninteractive' apt-get -qq install mysql-server \
     apg expect
 
 MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-$(apg -q -a 0 -n 1 -m 21 -M NCL)}
@@ -49,6 +49,13 @@ then
     echo "password=${MYSQL_ROOT_PASSWORD}"
     } | tee '/root/.my.cnf' > "${HOME}/.my.cnf";
     chmod 400 '/root/.my.cnf' "${HOME}/.my.cnf";
+    echo "Save root password to /root/.passwords file"
+    {
+    echo "[mysql]"
+    echo "user=root"
+    echo "password=${MYSQL_ROOT_PASSWORD}"
+    } >> "/root/.passwords";
+    chmod 400 "/root/.passwords";
 else
     echo "MySQL already configured" >&2
     exit

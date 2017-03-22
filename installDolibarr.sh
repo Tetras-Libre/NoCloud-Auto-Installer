@@ -117,8 +117,8 @@ then
     cp ${VERBOSE:+-v} /etc/apache2/sites-available/dolibarr-ssl.conf \
     /etc/apache2/sites-available/${RUNNING_DATE_TIME}_dolibarr-ssl.conf
 fi
-sed "s@<+ServerAdmin+>@${DOLIBARR_CONFIG_ServerAdmin:-<+ServerAdmin+>}@;
-    s@<+ServerName+>@${DOLIBARR_CONFIG_ServerName:-<+ServerName+>}@" \
+sed "s/<+ServerAdmin+>/${DOLIBARR_CONFIG_ServerAdmin}/;
+    s/<+ServerName+>/${DOLIBARR_CONFIG_ServerName}/" \
         ${SCRIPT_DIRECTORY%%/}/template_dolibarr-ssl.conf > \
     /etc/apache2/sites-available/dolibarr-ssl.conf
 

@@ -269,8 +269,8 @@ fi
 # Configure Apache for nextcloud
 echo "Configure Apache nextcloud-ssl.conf"
 sed \
-    "s@<+NEXTCLOUD_CONFIG_ServerAdmin+>@${NEXTCLOUD_CONFIG_ServerAdmin}@
-    s@<+NEXTCLOUD_CONFIG_ServerName+>@${NEXTCLOUD_CONFIG_ServerName}@" \
+    "s/<+NEXTCLOUD_CONFIG_ServerAdmin+>/${NEXTCLOUD_CONFIG_ServerAdmin}/;
+    s/<+NEXTCLOUD_CONFIG_ServerName+>/${NEXTCLOUD_CONFIG_ServerName}/" \
 `pwd`/template_nextcloud-ssl.conf > \
     /etc/apache2/sites-available/nextcloud-ssl.conf
 
@@ -333,13 +333,11 @@ sections="${sections} 'memcache.local' => 'OC\\Memcache\\APCu',"
 echo "Set /var/www/nexcloud/config/config.php"
 sed -i.bak "/'trusted_domains'/,/),/d;
 s@)@${sections})@;
-/array(/s@,@,\n@g;
-s@^\(\S\)@  \1@g;" `pwd`/config.php
+/array(/s@,@,\n@g;" `pwd`/config.php
 
 echo "sed -i.bak \"/'trusted_domains'/,/),/d;" \
      "s@)@${sections})@;" \
-     "/array(/s@,@,\n@g;" \
-     "s@^\(\S\)@  \1@g;\" `pwd`/config.php : terminated"
+     "/array(/s@,@,\n@;\" `pwd`/config.php : terminated"
 echo "WARNING : Take a look at /var/www/nexcloud/config/config.php"
 
 cd ${SCRIPT_DIRECTORY}

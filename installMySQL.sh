@@ -49,6 +49,13 @@ then
     echo "password=${MYSQL_ROOT_PASSWORD}"
     } | tee '/root/.my.cnf' > "${HOME}/.my.cnf";
     chmod 400 '/root/.my.cnf' "${HOME}/.my.cnf";
+    echo "Save root password to /root/.passwords file"
+    {
+    echo "[mysql]"
+    echo "user=root"
+    echo "password=${MYSQL_ROOT_PASSWORD}"
+    } >> "/root/.passwords";
+    chmod 400 "/root/.passwords";
 else
     echo "MySQL already configured" >&2
     exit

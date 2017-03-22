@@ -38,7 +38,7 @@ then
 fi
 
 DEBIAN_FRONTEND='noninteractive' apt-get update \
-    && DEBIAN_FRONTEND='noninteractive' apt-get -qq install mount zip unzip
+    && DEBIAN_FRONTEND='noninteractive' apt-get -qq install mount zip unzip apg
 
 
 if [ ! -d ${DOLIBARR_INSTALL_DIR} ]

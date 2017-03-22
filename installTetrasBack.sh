@@ -23,7 +23,7 @@ TB_CONFIG_ServerAdmin=${DOLIBARR_CONFIG_ServerAdmin:-${SERVER_ADMIN}}
 set -o nounset                              # Treat unset variables as an error
 
 DEBIAN_FRONTEND='noninteractive' apt-get update \
-    DEBIAN_FRONTEND="noninteractive" apt-get -qq install git gnulib perl sendmail \
+    && DEBIAN_FRONTEND="noninteractive" apt-get -qq install git gnulib perl sendmail \
     udev systemd
 
 SCRIPT_DIRECTORY=`pwd`

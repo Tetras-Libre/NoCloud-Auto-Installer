@@ -265,12 +265,23 @@ sed \
 `pwd`/etc/${WEB_SERVER}/sites-available/nextcloud.conf > \
     /etc/${WEB_SERVER}/sites-available/nextcloud.conf
 
+if [ ${WEB_SERVER} == "nginx" ] && [ ! -e /etc/nginx/ssl.conf ]
+then
+    # Configure Apache for nextcloud
+    echo "Configure nginx ssl.conf"
+    sed \
+        "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
+        s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
+            `pwd`/etc/nginx/ssl.conf > \
+            /etc/nginx/ssl.conf
+fi
+
 #ln -s /etc/apache2/sites-available/nextcloud.conf \
 #    /etc/apache2/sites-enabled/nextcloud.conf
 #echo "WARNING : SSLEngine is disabled : to enable modify file /etc/apache2/ssl.conf"
 #echo "Configure Apache nextcloud.conf : terminated"
 
-if [ ${WEB_SERVER} == "apache2" ]
+if [ "${WEB_SERVER}" == "apache2" ]
 then
 echo "a2enmod rewrite"
     a2enmod rewrite

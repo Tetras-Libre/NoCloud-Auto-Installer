@@ -43,7 +43,7 @@ echo "Set tetras-back's configuration file for ${WEB_SERVER}"
 # Save last tetras-back-ssh.conf if exists
 if [ -f /etc/${WEB_SERVER}/sites-available/tetras-back.conf ]
 then
-    echo "Dolibarr's apache configuration already exists"
+    echo "Tetras back's ${WEB_SERVER} configuration already exists"
     echo "Backup file is created at" \
         "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back.conf"
 
@@ -52,12 +52,12 @@ then
     cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/tetras-back.conf \
     /etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back.conf
 fi
-sed "s@<+ServerAdmin+>@${DOLIBARR_CONFIG_ServerAdmin:-<+ServerAdmin+>}@;
-    s@<+ServerName+>@${DOLIBARR_CONFIG_ServerName:-<+ServerName+>}@" \
+sed "s@<+TB_CONFIG_ServerAdmin+>@${DOLIBARR_CONFIG_ServerAdmin:-<+ServerAdmin+>}@;
+    s@<+TB_CONFIG_ServerName+>@${DOLIBARR_CONFIG_ServerName:-<+ServerName+>}@" \
         `pwd`/etc/${WEB_SERVER}/sites-available/tetras-back.conf > \
     /etc/${WEB_SERVER}/sites-available/tetras-back.conf
 
-if [ ${WEB_SERVER} == "apache2" ]
+if [ "${WEB_SERVER}" == "apache2" ]
 then
     a2ensite tetras-back.conf
     apachectl configtest && apachectl restart || echo "Failed restartin apache"

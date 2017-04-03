@@ -122,7 +122,7 @@ sed "s/<+ServerAdmin+>/${DOLIBARR_CONFIG_ServerAdmin}/;
         ${SCRIPT_DIRECTORY%%/}/etc/${WEB_SERVER}/sites-available/dolibarr.conf > \
     /etc/${WEB_SERVER}/sites-available/dolibarr.conf
 
-if [ ${WEB_SERVER} == "apache2" ]
+if [ "${WEB_SERVER}" == "apache2" ]
 then
     a2ensite dolibarr.conf
     apachectl configtest && apachectl restart || echo "Failed restartin apache"

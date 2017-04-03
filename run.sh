@@ -31,6 +31,6 @@ for mod in $MODS
 do
     if [ -f $mod.sh ]
     then
-        . `pwd`/$mod.sh | tee -a $mod.log install.log
+        sh `pwd`/$mod.sh | tee -a $mod.log install.log
     fi
 done

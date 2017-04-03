@@ -17,8 +17,8 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-TB_CONFIG_ServerName=${DOLIBARR_CONFIG_ServerName:-tetras-back.${DOMAIN}}
-TB_CONFIG_ServerAdmin=${DOLIBARR_CONFIG_ServerAdmin:-${SERVER_ADMIN}}
+TB_CONFIG_ServerName=${TB_CONFIG_ServerName:-tetras-back.${DOMAIN}}
+TB_CONFIG_ServerAdmin=${TB_CONFIG_ServerAdmin:-${SERVER_ADMIN}}
 
 set -o nounset                              # Treat unset variables as an error
 
@@ -52,8 +52,8 @@ then
     cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/tetras-back.conf \
     /etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back.conf
 fi
-sed "s@<+TB_CONFIG_ServerAdmin+>@${DOLIBARR_CONFIG_ServerAdmin:-<+ServerAdmin+>}@;
-    s@<+TB_CONFIG_ServerName+>@${DOLIBARR_CONFIG_ServerName:-<+ServerName+>}@" \
+sed "s@<+ServerAdmin+>@${TB_CONFIG_ServerAdmin:-<+ServerAdmin+>}@;
+    s@<+ServerName+>@${TB_CONFIG_ServerName:-<+ServerName+>}@" \
         `pwd`/etc/${WEB_SERVER}/sites-available/tetras-back.conf > \
     /etc/${WEB_SERVER}/sites-available/tetras-back.conf
 

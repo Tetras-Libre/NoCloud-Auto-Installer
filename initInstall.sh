@@ -52,7 +52,6 @@ DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
     debian-goodies \
     fail2ban \
     git \
-    libapache2-mod-php5 \
     lm-sensors \
     make \
     ntp \
@@ -71,6 +70,7 @@ DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
     ufw \
     unattended-upgrades \
     vim-nox \
+    ${WEB_SERVER_PACKAGES} \
     wget
 
 # Configure UFW

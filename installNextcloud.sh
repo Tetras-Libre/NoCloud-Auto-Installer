@@ -130,7 +130,7 @@ sed -i.bak -e 's/\(upload_max_filesize\).*/\1 16G/' \
     -e 's/\(post_max_size\).*/\1 16G/' \
     ${NEXTCLOUD_INSTALL_DIR}.htaccess
 
-for dir in apache2 cgi cli fpm
+for dir in apache2 cli fpm
 do
     if [ -e /etc/php5/$dir/php.ini ]
     then
@@ -309,6 +309,7 @@ echo "a2enmod rewrite"
     apachectl configtest && apachectl restart || echo "Failed restartin apache"
 else
     ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/
+    cp `pwd`/etc/ngix/conf.d/* /etc/ngix/conf.d/
     systemctl restart nginx
 fi
 

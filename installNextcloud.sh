@@ -251,36 +251,24 @@ fi
 
 . `pwd`/nextcloudStrongDirectoryPermissions.sh
 
-if [ -f /etc/${WEB_SERVER}/nextcloud-ssl.conf ]
+if [ -f /etc/${WEB_SERVER}/nextcloud.conf ]
 then
-    cp /etc/${WEB_SERVER}/nextcloud-ssl.conf \
-        /etc/${WEB_SERVER}/${RUNNING_DATE_TIME}_nextcloud-ssl.conf
-fi
-
-if [ -f /etc/${WEB_SERVER}/sites-available/ssl.conf ]
-then
-    cp /etc/${WEB_SERVER}/sites-available/ssl.conf /etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_ssl.conf
+    cp /etc/${WEB_SERVER}/nextcloud.conf \
+        /etc/${WEB_SERVER}/${RUNNING_DATE_TIME}_nextcloud.conf
 fi
 
 # Configure Apache for nextcloud
-echo "Configure ${WEB_SERVER} nextcloud-ssl.conf"
+echo "Configure ${WEB_SERVER} nextcloud.conf"
 sed \
     "s/<+NEXTCLOUD_CONFIG_ServerAdmin+>/${NEXTCLOUD_CONFIG_ServerAdmin}/;
     s/<+NEXTCLOUD_CONFIG_ServerName+>/${NEXTCLOUD_CONFIG_ServerName}/" \
-`pwd`/etc/${WEB_SERVER}/sites-available/nextcloud-ssl.conf > \
-    /etc/${WEB_SERVER}/sites-available/nextcloud-ssl.conf
+`pwd`/etc/${WEB_SERVER}/sites-available/nextcloud.conf > \
+    /etc/${WEB_SERVER}/sites-available/nextcloud.conf
 
-sed \
-    "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
-    s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
-        `pwd`/etc/${WEB_SERVER}/ssl.conf > \
-        /etc/${WEB_SERVER}/ssl.conf
-
-
-#ln -s /etc/apache2/sites-available/nextcloud-ssl.conf \
-#    /etc/apache2/sites-enabled/nextcloud-ssl.conf
+#ln -s /etc/apache2/sites-available/nextcloud.conf \
+#    /etc/apache2/sites-enabled/nextcloud.conf
 #echo "WARNING : SSLEngine is disabled : to enable modify file /etc/apache2/ssl.conf"
-#echo "Configure Apache nextcloud-ssl.conf : terminated"
+#echo "Configure Apache nextcloud.conf : terminated"
 
 if [ ${WEB_SERVER} == "apache2" ]
 then
@@ -304,12 +292,12 @@ echo "a2enmod rewrite"
 
     # activation ssl
     a2enmod ssl
-    a2ensite nextcloud-ssl
+    a2ensite nextcloud
 
     echo "apachectl restart"
     apachectl configtest && apachectl restart || echo "Failed restartin apache"
 else
-    ln -s /etc/nginx/sites-available/nextcloud-ssl.conf /etc/nginx/sites-enabled/
+    ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/
     systemctl restart nginx
 fi
 

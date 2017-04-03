@@ -41,45 +41,27 @@ cd $SCRIPT_DIRECTORY
 echo "Set tetras-back's configuration file for ${WEB_SERVER}"
 
 # Save last tetras-back-ssh.conf if exists
-if [ -f /etc/${WEB_SERVER}/sites-available/tetras-back-ssl.conf ]
+if [ -f /etc/${WEB_SERVER}/sites-available/tetras-back.conf ]
 then
     echo "Dolibarr's apache configuration already exists"
     echo "Backup file is created at" \
-        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back-ssl.conf"
+        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back.conf"
 
-    echo "cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/tetras-back-ssl.conf" \
-        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back-ssl.conf"
-    cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/tetras-back-ssl.conf \
-    /etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back-ssl.conf
+    echo "cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/tetras-back.conf" \
+        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back.conf"
+    cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/tetras-back.conf \
+    /etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back.conf
 fi
 sed "s@<+ServerAdmin+>@${DOLIBARR_CONFIG_ServerAdmin:-<+ServerAdmin+>}@;
     s@<+ServerName+>@${DOLIBARR_CONFIG_ServerName:-<+ServerName+>}@" \
-        `pwd`/etc/${WEB_SERVER}/sites-available/tetras-back-ssl.conf > \
-    /etc/${WEB_SERVER}/sites-available/tetras-back-ssl.conf
-
-# Set ssl.conf
-if [ -f /etc/${WEB_SERVER}/sites-available/ssl.conf ]
-then
-    echo "${WEB_SERVER} ssl configuration already exists"
-    echo "Backup file is created at " \
-        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}-ssl.conf"
-
-    echo "cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/tetras-back-ssl.conf" \
-    "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}-ssl.conf"
-    cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/ssl.conf \
-    /etc/${WEB_SERVER}/${RUNNING_DATE_TIME}-ssl.conf
-fi
-sed \
-    "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
-    s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
-        ${SCRIPT_DIRECTORY%%/}/etc/${WEB_SERVER}/sites-available/ssl.conf > \
-        /etc/${WEB_SERVER}/ssl.conf
+        `pwd`/etc/${WEB_SERVER}/sites-available/tetras-back.conf > \
+    /etc/${WEB_SERVER}/sites-available/tetras-back.conf
 
 if [ ${WEB_SERVER} == "apache2" ]
 then
-    a2ensite tetras-back-ssl.conf
+    a2ensite tetras-back.conf
     apachectl configtest && apachectl restart || echo "Failed restartin apache"
 else
-    ln -s /etc/nginx/sites-available/tetras-back-ssl.conf /etc/nginx/sites-enabled
+    ln -s /etc/nginx/sites-available/tetras-back.conf /etc/nginx/sites-enabled
     systemctl restart nginx
 fi

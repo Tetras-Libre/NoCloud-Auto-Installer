@@ -106,46 +106,28 @@ mount ${VERBOSE:+v} /usr/share/dolibarr/documents
 echo "Set dolibarr's configuration file for ${WEB_SERVER}"
 
 # Save last dolibarr-ssh.conf if exists
-if [ -f /etc/${WEB_SERVER}/sites-available/dolibarr-ssl.conf ]
+if [ -f /etc/${WEB_SERVER}/sites-available/dolibarr.conf ]
 then
     echo "Dolibarr's ${WEB_SERVER} configuration already exists"
     echo "Backup file is created at" \
-        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_dolibarr-ssl.conf"
+        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_dolibarr.conf"
 
-    echo "cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/dolibarr-ssl.conf" \
-        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_dolibarr-ssl.conf"
-    cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/dolibarr-ssl.conf \
-    /etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_dolibarr-ssl.conf
+    echo "cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/dolibarr.conf" \
+        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_dolibarr.conf"
+    cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/dolibarr.conf \
+    /etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_dolibarr.conf
 fi
 sed "s/<+ServerAdmin+>/${DOLIBARR_CONFIG_ServerAdmin}/;
     s/<+ServerName+>/${DOLIBARR_CONFIG_ServerName}/" \
-        ${SCRIPT_DIRECTORY%%/}/etc/${WEB_SERVER}/sites-available/dolibarr-ssl.conf > \
-    /etc/${WEB_SERVER}/sites-available/dolibarr-ssl.conf
-
-# Set ssl.conf
-if [ -f /etc/${WEB_SERVER}/sites-available/ssl.conf ]
-then
-    echo "${WEB_SERVER} ssl configuration already exists"
-    echo "Backup file is created at " \
-        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}-ssl.conf"
-
-    echo "cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/dolibarr-ssl.conf" \
-    "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}-ssl.conf"
-    cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/ssl.conf \
-    /etc/${WEB_SERVER}/${RUNNING_DATE_TIME}-ssl.conf
-fi
-sed \
-    "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
-    s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
-        ${SCRIPT_DIRECTORY%%/}/etc/${WEB_SERVER}/sites-available/ssl.conf > \
-        /etc/${WEB_SERVER}/ssl.conf
+        ${SCRIPT_DIRECTORY%%/}/etc/${WEB_SERVER}/sites-available/dolibarr.conf > \
+    /etc/${WEB_SERVER}/sites-available/dolibarr.conf
 
 if [ ${WEB_SERVER} == "apache2" ]
 then
-    a2ensite dolibarr-ssl.conf
+    a2ensite dolibarr.conf
     apachectl configtest && apachectl restart || echo "Failed restartin apache"
 else
-    ln -s /etc/nginx/sites-available/dolibarr-ssl.conf /etc/nginx/sites-enabled
+    ln -s /etc/nginx/sites-available/dolibarr.conf /etc/nginx/sites-enabled
     systemctl restart nginx
 fi
 

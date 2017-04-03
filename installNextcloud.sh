@@ -310,6 +310,7 @@ echo "a2enmod rewrite"
 else
     ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/
     cp `pwd`/etc/ngix/conf.d/* /etc/ngix/conf.d/
+    sed -ibak /etc/nginx/nginx.conf 's/^\s*#\s*\(server_names_hash_bucket_size\)/\1/'
     systemctl restart nginx
 fi
 

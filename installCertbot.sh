@@ -19,10 +19,14 @@
 
 . `pwd`/main.env
 
+DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
+    certbot \
+    python-certbot-apache
+
 DOMAINS="dolibarr.${DOMAIN},nextcloud.${DOMAIN},tetras-back.${DOMAIN}"
 ARGS="--hsts --must-staple --agree-tos --email=${SERVER_ADMIN} --domains=${DOMAINS}"
 line="0 1 `date +%d` */2 * /usr/bin/certbot renew --force-renewal"
-if [ ${WEB_SERVER} == "apache2" ]
+if [ "${WEB_SERVER}" == "apache2" ]
 then
     OPTS="run --apache"
     line+="${RENEW}"

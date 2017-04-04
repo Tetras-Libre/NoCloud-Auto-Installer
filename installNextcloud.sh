@@ -273,6 +273,7 @@ then
         "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
         s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
             `pwd`/etc/nginx/ssl.conf > \
+            openssl dhparam -out /etc/nginx/dhparam.pem 2048
             /etc/nginx/ssl.conf
 fi
 

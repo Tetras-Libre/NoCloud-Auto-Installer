@@ -1,4 +1,4 @@
-#!/bin/bash - 
+#!/bin/bash -
 #
 # Copyright (C) 2017  Tetras Libre <admin@tetras-libre.fr>
 # Author: Curt, Sebastien <sebastien.curt@tetras-libre.fr>
@@ -21,7 +21,7 @@ set -o nounset                              # Treat unset variables as an error
 ###########################################################################
 # 1. Download Nexcloud Package
 # 2. Check package integrity and source authenticity
-# 3. 
+# 3.
 # 4. Start mysql service
 ###########################################################################
 SCRIPT_DIRECTORY=`pwd`
@@ -39,7 +39,6 @@ cd $NEXTCLOUD_DIRECTORY_SOURCES
 # 1. Download Nexcloud Package
 DEBIAN_FRONTEND='noninteractive' apt-get update \
     && DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
-    apache2 \
     apg \
     bzip2 \
     gnupg2 \
@@ -54,6 +53,7 @@ DEBIAN_FRONTEND='noninteractive' apt-get update \
     sudo \
     tar \
     ufw \
+    ${WEB_SERVER_PACKAGES} \
     wget
 
 if [ -d ${NEXTCLOUD_INSTALL_DIR} ]
@@ -130,11 +130,17 @@ sed -i.bak -e 's/\(upload_max_filesize\).*/\1 16G/' \
     -e 's/\(post_max_size\).*/\1 16G/' \
     ${NEXTCLOUD_INSTALL_DIR}.htaccess
 
-# set max input time from 1 minute to 1 hour
-# php timeout for large file
-sed -i.bak -e 's/\(max_input_time =\).*/\1 3600/' \
-    -e 's/\(max_execution_time =\).*/\1 3600/' \
-    /etc/php5/apache2/php.ini
+for dir in apache2 cli fpm
+do
+    if [ -e /etc/php5/$dir/php.ini ]
+    then
+        # set max input time from 1 minute to 1 hour
+        # php timeout for large file
+        sed -i.bak -e 's/\(max_input_time =\).*/\1 3600/' \
+            -e 's/\(max_execution_time =\).*/\1 3600/' \
+            /etc/php5/$dir/php.ini
+    fi
+done
 
 echo "configure mysqld compatiblity to nextcloud"
 # configure mysqld for nextcloud
@@ -245,63 +251,70 @@ fi
 
 . `pwd`/nextcloudStrongDirectoryPermissions.sh
 
-if [ -f /etc/apache2/nextcloud-ssl.conf ]
+if [ -f /etc/${WEB_SERVER}/nextcloud.conf ]
 then
-    cp /etc/apache2/nextcloud-ssl.conf \
-        /etc/apache2/${RUNNING_DATE_TIME}_nextcloud-ssl.conf
-fi
-
-if [ -f /etc/apache2/sites-available/ssl.conf ]
-then
-    cp /etc/apache2/sites-available/ssl.conf /etc/apache2/sites-available/${RUNNING_DATE_TIME}_ssl.conf
+    cp /etc/${WEB_SERVER}/nextcloud.conf \
+        /etc/${WEB_SERVER}/${RUNNING_DATE_TIME}_nextcloud.conf
 fi
 
 # Configure Apache for nextcloud
-echo "Configure Apache nextcloud-ssl.conf"
+echo "Configure ${WEB_SERVER} nextcloud.conf"
 sed \
     "s/<+NEXTCLOUD_CONFIG_ServerAdmin+>/${NEXTCLOUD_CONFIG_ServerAdmin}/;
     s/<+NEXTCLOUD_CONFIG_ServerName+>/${NEXTCLOUD_CONFIG_ServerName}/" \
-`pwd`/template_nextcloud-ssl.conf > \
-    /etc/apache2/sites-available/nextcloud-ssl.conf
+`pwd`/etc/${WEB_SERVER}/sites-available/nextcloud.conf > \
+    /etc/${WEB_SERVER}/sites-available/nextcloud.conf
 
-sed \
-    "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
-    s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
-        `pwd`/template_ssl.conf > \
-        /etc/apache2/ssl.conf
+if [ ${WEB_SERVER} == "nginx" ] && [ ! -e /etc/nginx/ssl.conf ]
+then
+    # Configure Apache for nextcloud
+    echo "Configure nginx ssl.conf"
+    sed \
+        "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
+        s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
+            `pwd`/etc/nginx/ssl.conf > \
+            /etc/nginx/ssl.conf
+fi
 
-
-#ln -s /etc/apache2/sites-available/nextcloud-ssl.conf \
-#    /etc/apache2/sites-enabled/nextcloud-ssl.conf
+#ln -s /etc/apache2/sites-available/nextcloud.conf \
+#    /etc/apache2/sites-enabled/nextcloud.conf
 #echo "WARNING : SSLEngine is disabled : to enable modify file /etc/apache2/ssl.conf"
-#echo "Configure Apache nextcloud-ssl.conf : terminated"
+#echo "Configure Apache nextcloud.conf : terminated"
 
+if [ "${WEB_SERVER}" == "apache2" ]
+then
 echo "a2enmod rewrite"
-a2enmod rewrite
-echo "a2enmod rewrite : terminated"
-echo "a2enmod headers"
-a2enmod headers
-echo "a2enmod env"
-a2enmod env
-echo "a2enmod env : terminated"
-echo "a2enmod dir"
-a2enmod dir
-echo "a2enmod dir : terminated"
-echo "a2enmod mime"
-a2enmod mime
-echo "a2enmod mime : terminated"
-echo "a2enmod ssl"
-a2enmod ssl
-echo "a2enmod ssl : terminated"
+    a2enmod rewrite
+    echo "a2enmod rewrite : terminated"
+    echo "a2enmod headers"
+    a2enmod headers
+    echo "a2enmod env"
+    a2enmod env
+    echo "a2enmod env : terminated"
+    echo "a2enmod dir"
+    a2enmod dir
+    echo "a2enmod dir : terminated"
+    echo "a2enmod mime"
+    a2enmod mime
+    echo "a2enmod mime : terminated"
+    echo "a2enmod ssl"
+    a2enmod ssl
+    echo "a2enmod ssl : terminated"
 
-# activation ssl
-a2enmod ssl
-a2ensite nextcloud-ssl
+    # activation ssl
+    a2enmod ssl
+    a2ensite nextcloud
 
-echo "apachectl restart"
-apachectl configtest && apachectl restart || echo "Failed restartin apache"
+    echo "apachectl restart"
+    apachectl configtest && apachectl restart || echo "Failed restartin apache"
+else
+    ln -s /etc/nginx/sites-available/nextcloud.conf /etc/nginx/sites-enabled/
+    cp `pwd`/etc/ngix/conf.d/* /etc/ngix/conf.d/
+    sed -ibak /etc/nginx/nginx.conf 's/^\s*#\s*\(server_names_hash_bucket_size\)/\1/'
+    systemctl restart nginx
+fi
 
-echo "Warning: ssl isn't properly activated, please run certbot then uncomment the contents of /etc/apache2/ssl.conf"
+echo "Warning: ssl isn't properly activated, please run certbot then uncomment the contents of /etc/${WEB_SERVER}/ssl.conf"
 
 line="*/15  *  *  *  * php -f ${NEXTCLOUD_INSTALL_DIR}/cron.php"
 echo "Adding crontab entry '$line' to www-data"

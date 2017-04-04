@@ -17,8 +17,8 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-TB_CONFIG_ServerName=${DOLIBARR_CONFIG_ServerName:-tetras-back.${DOMAIN}}
-TB_CONFIG_ServerAdmin=${DOLIBARR_CONFIG_ServerAdmin:-${SERVER_ADMIN}}
+TB_CONFIG_ServerName=${TB_CONFIG_ServerName:-tetras-back.${DOMAIN}}
+TB_CONFIG_ServerAdmin=${TB_CONFIG_ServerAdmin:-${SERVER_ADMIN}}
 
 set -o nounset                              # Treat unset variables as an error
 
@@ -38,42 +38,30 @@ unset DEBIAN_FRONTEND
 
 cd $SCRIPT_DIRECTORY
 
-echo "Set tetras-back's configuration file for apache 2"
+echo "Set tetras-back's configuration file for ${WEB_SERVER}"
 
 # Save last tetras-back-ssh.conf if exists
-if [ -f /etc/apache2/sites-available/tetras-back-ssl.conf ]
+if [ -f /etc/${WEB_SERVER}/sites-available/tetras-back.conf ]
 then
-    echo "Dolibarr's apache configuration already exists"
+    echo "Tetras back's ${WEB_SERVER} configuration already exists"
     echo "Backup file is created at" \
-        "/etc/apache2/sites-available/${RUNNING_DATE_TIME}_tetras-back-ssl.conf"
+        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back.conf"
 
-    echo "cp ${VERBOSE:+-v} /etc/apache2/sites-available/tetras-back-ssl.conf" \
-        "/etc/apache2/sites-available/${RUNNING_DATE_TIME}_tetras-back-ssl.conf"
-    cp ${VERBOSE:+-v} /etc/apache2/sites-available/tetras-back-ssl.conf \
-    /etc/apache2/sites-available/${RUNNING_DATE_TIME}_tetras-back-ssl.conf
+    echo "cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/tetras-back.conf" \
+        "/etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back.conf"
+    cp ${VERBOSE:+-v} /etc/${WEB_SERVER}/sites-available/tetras-back.conf \
+    /etc/${WEB_SERVER}/sites-available/${RUNNING_DATE_TIME}_tetras-back.conf
 fi
-sed "s@<+ServerAdmin+>@${DOLIBARR_CONFIG_ServerAdmin:-<+ServerAdmin+>}@;
-    s@<+ServerName+>@${DOLIBARR_CONFIG_ServerName:-<+ServerName+>}@" \
-        `pwd`/template_tetras-back-ssl.conf > \
-    /etc/apache2/sites-available/tetras-back-ssl.conf
+sed "s@<+ServerAdmin+>@${TB_CONFIG_ServerAdmin:-<+ServerAdmin+>}@;
+    s@<+ServerName+>@${TB_CONFIG_ServerName:-<+ServerName+>}@" \
+        `pwd`/etc/${WEB_SERVER}/sites-available/tetras-back.conf > \
+    /etc/${WEB_SERVER}/sites-available/tetras-back.conf
 
-# Set ssl.conf
-if [ -f /etc/apache2/sites-available/ssl.conf ]
+if [ "${WEB_SERVER}" == "apache2" ]
 then
-    echo "Apache ssl configuration already exists"
-    echo "Backup file is created at " \
-        "/etc/apache2/sites-available/${RUNNING_DATE_TIME}-ssl.conf"
-
-    echo "cp ${VERBOSE:+-v} /etc/apache2/sites-available/tetras-back-ssl.conf" \
-    "/etc/apache2/sites-available/${RUNNING_DATE_TIME}-ssl.conf"
-    cp ${VERBOSE:+-v} /etc/apache2/ssl.conf \
-    /etc/apache2/${RUNNING_DATE_TIME}-ssl.conf
+    a2ensite tetras-back.conf
+    apachectl configtest && apachectl restart || echo "Failed restartin apache"
+else
+    ln -s /etc/nginx/sites-available/tetras-back.conf /etc/nginx/sites-enabled
+    systemctl restart nginx
 fi
-sed \
-    "s@<+SSLCertificateFile+>@${NEXTCLOUD_CONFIG_certificateFile:-<+SSLCertificateFile+>}@
-    s@<+SSLCertificateKeyFile+>@${NEXTCLOUD_CONFIG_certificateKeyFile:-<+SSLCertificateKeyFile+>}@" \
-        ${SCRIPT_DIRECTORY%%/}/template_ssl.conf > \
-        /etc/apache2/ssl.conf
-
-a2ensite tetras-back-ssl.conf
-apachectl configtest && apachectl restart || echo "Failed restartin apache"

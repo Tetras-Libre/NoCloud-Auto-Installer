@@ -18,6 +18,11 @@
 
 set -o nounset                              # Treat unset variables as an error
 
+if [ ! -e `pwd`/main.env ]
+then
+    echo "Please copy `pwd`/main.env.sample to `pwd`/main.env and edit it"
+    exit 1
+fi
 . `pwd`/main.env
 
 MODS="initInstall installMySQL installNextcloud installDolibarr installTetrasBack"
@@ -26,6 +31,6 @@ for mod in $MODS
 do
     if [ -f $mod.sh ]
     then
-        . `pwd`/$mod.sh | tee -a $mod.log install.log
+        sh `pwd`/$mod.sh | tee -a $mod.log install.log
     fi
 done

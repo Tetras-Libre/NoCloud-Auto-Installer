@@ -19,21 +19,27 @@
 
 . `pwd`/main.env
 
-DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
-    certbot \
-    python-certbot-apache
-
 DOMAINS="dolibarr.${DOMAIN},nextcloud.${DOMAIN},tetras-back.${DOMAIN}"
-ARGS="--hsts --must-staple --agree-tos --email=${SERVER_ADMIN} --domains=${DOMAINS}"
+ARGS="--hsts --must-staple --email=${SERVER_ADMIN} --domains=${DOMAINS}
+    --text --agree-tos --dry-run"
 line="0 1 `date +%d` */2 * /usr/bin/certbot renew --force-renewal"
 if [ "${WEB_SERVER}" == "apache2" ]
 then
+    additional_packages="python-certbot-apache"
     OPTS="run --apache"
     line+="${RENEW}"
 else
     OPTS="certonly --standalone"
-    EXTRA_ARGS="--pre-hook \"systemctl stop nginx\" --post-hook \"systemctl start nginx\""
+    precmd="systemctl stop nginx"
+    postcmd="systemctl start nginx"
+    EXTRA_ARGS="--pre-hook \"$precmd\" --post-hook \"$postcmd\""
 fi
-/usr/bin/certbot ${OPTS} ${ARGS} ${EXTRA_ARGS}
+
+DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
+    certbot ${additional_packages}
+
+$precmd
+/usr/bin/certbot ${OPTS} ${ARGS}
+$postcmd
 line+=" ${EXTRA_ARGS} > /dev/null"
 (crontab -l; echo "${line}") | crontab -

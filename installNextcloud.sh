@@ -349,5 +349,15 @@ echo "WARNING : Take a look at /var/www/nexcloud/config/config.php"
 
 cd ${SCRIPT_DIRECTORY}
 
+echo "Copying nextcloud php.ini recommandations (opcache)"
+if [ "${WEB_SERVER}" == "apache2" ]
+then
+    cat ${SCRIPT_DIRECTORY}/etc/php5/apache2/php.ini >> /etc/php5/apache2/php.ini
+else
+    cat ${SCRIPT_DIRECTORY}/etc/php5/apache2/php.ini >> /etc/php5/fpm/php.ini
+fi
+
+systemctl restart apache2
+
 unset nextcloudPassword
 unset adminPassword

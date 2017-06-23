@@ -56,13 +56,13 @@ DEBIAN_FRONTEND='noninteractive' apt-get -qq install \
     make \
     ntp \
     pandoc \
-    php5 \
-    php5-apcu \
-    php5-curl \
-    php5-gd \
-    php5-intl \
-    php5-mcrypt \
-    php5-mysql \
+    php \
+    php-apcu \
+    php-curl \
+    php-gd \
+    php-intl \
+    php-mcrypt \
+    php-mysql \
     postfix \
     openssh-server \
     tar \

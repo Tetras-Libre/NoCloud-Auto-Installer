@@ -43,13 +43,13 @@ DEBIAN_FRONTEND='noninteractive' apt-get update \
     bzip2 \
     gnupg2 \
     isomd5sum \
-    php5 \
-    php5-apcu \
-    php5-curl \
-    php5-gd \
-    php5-intl \
-    php5-mcrypt \
-    php5-mysql \
+    php \
+    php-apcu \
+    php-curl \
+    php-gd \
+    php-intl \
+    php-mcrypt \
+    php-mysql \
     sudo \
     tar \
     ufw \
@@ -132,13 +132,13 @@ sed -i.bak -e 's/\(upload_max_filesize\).*/\1 16G/' \
 
 for dir in apache2 cli fpm
 do
-    if [ -e /etc/php5/$dir/php.ini ]
+    if [ -e /etc/php/7.0/$dir/php.ini ]
     then
         # set max input time from 1 minute to 1 hour
         # php timeout for large file
         sed -i.bak -e 's/\(max_input_time =\).*/\1 3600/' \
             -e 's/\(max_execution_time =\).*/\1 3600/' \
-            /etc/php5/$dir/php.ini
+            /etc/php/7.0/$dir/php.ini
     fi
 done
 
@@ -352,9 +352,9 @@ cd ${SCRIPT_DIRECTORY}
 echo "Copying nextcloud php.ini recommandations (opcache)"
 if [ "${WEB_SERVER}" == "apache2" ]
 then
-    cat ${SCRIPT_DIRECTORY}/etc/php5/apache2/php.ini >> /etc/php5/apache2/php.ini
+    cat ${SCRIPT_DIRECTORY}/etc/php/7.0/apache2/php.ini >> /etc/php/7.0/apache2/php.ini
 else
-    cat ${SCRIPT_DIRECTORY}/etc/php5/apache2/php.ini >> /etc/php5/fpm/php.ini
+    cat ${SCRIPT_DIRECTORY}/etc/php/7.0/apache2/php.ini >> /etc/php/7.0/fpm/php.ini
 fi
 
 systemctl restart apache2

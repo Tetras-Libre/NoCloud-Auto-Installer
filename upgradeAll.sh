@@ -22,4 +22,5 @@ DIR=`dirname $0`
 . $DIR/upgradeNextcloud.sh
 . $DIR/upgradeTetrasBack.sh
 . $DIR/upgradeDolibarr.sh
+systemctl restart systemd-logind
 checkrestart

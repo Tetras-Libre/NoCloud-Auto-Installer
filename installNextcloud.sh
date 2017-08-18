@@ -331,7 +331,6 @@ sed -i.bak -e "/'trusted_domains'/,/),/d;
 s@)@${sections})@;
 /array(/s@,@,\n@g;" \
     -e 's/APCu/OC\\\\Memcache\\\\APCu/' \
-    -e "s/^);$/  'updater.release.channel' => 'production',\n);/" \
     `pwd`/config.php
 
 echo "sed -i.bak \"/'trusted_domains'/,/),/d;" \

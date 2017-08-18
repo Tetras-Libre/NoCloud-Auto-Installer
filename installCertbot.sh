@@ -19,9 +19,11 @@
 
 . `pwd`/main.env
 
+apt-get update && apt-get install certbot
+
 DOMAINS="dolibarr.${DOMAIN},nextcloud.${DOMAIN},tetras-back.${DOMAIN}"
 ARGS="--hsts --must-staple --email=${SERVER_ADMIN} --domains=${DOMAINS}
-    --text --agree-tos --dry-run"
+    --text --agree-tos"
 line="0 1 `date +%d` */2 * /usr/bin/certbot renew --force-renewal"
 if [ "${WEB_SERVER}" == "apache2" ]
 then

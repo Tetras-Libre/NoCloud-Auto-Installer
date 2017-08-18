@@ -48,8 +48,13 @@ DEBIAN_FRONTEND='noninteractive' apt-get update \
     php-curl \
     php-gd \
     php-intl \
+    php-imagick \
+    php-json \
+    php-mbstring \
     php-mcrypt \
     php-mysql \
+    php-xml \
+    php-zip \
     sudo \
     tar \
     ufw \
@@ -284,26 +289,13 @@ fi
 
 if [ "${WEB_SERVER}" == "apache2" ]
 then
-echo "a2enmod rewrite"
-    a2enmod rewrite
-    echo "a2enmod rewrite : terminated"
-    echo "a2enmod headers"
-    a2enmod headers
-    echo "a2enmod env"
-    a2enmod env
-    echo "a2enmod env : terminated"
-    echo "a2enmod dir"
-    a2enmod dir
-    echo "a2enmod dir : terminated"
-    echo "a2enmod mime"
-    a2enmod mime
-    echo "a2enmod mime : terminated"
-    echo "a2enmod ssl"
-    a2enmod ssl
-    echo "a2enmod ssl : terminated"
-
+    MODS="php7.0 rewrite headers env dir mime ssl zip"
+    for mod in ${MODS}
+    do
+        echo "enabling '$mod'"
+        echo "enabling '$mod' : terminated"
+    done
     # activation ssl
-    a2enmod ssl
     a2ensite nextcloud
 
     echo "apachectl restart"

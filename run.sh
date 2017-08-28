@@ -25,8 +25,6 @@ then
 fi
 . `pwd`/main.env
 
-MODS="initInstall installMySQL installNextcloud installDolibarr installTetrasBack"
-
 for mod in $MODS
 do
     if [ -f $mod.sh ]

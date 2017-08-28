@@ -18,9 +18,20 @@
 
 aptitude update && aptitude upgrade
 DIR=`dirname $0`
+. $DIR/main.env
 . $DIR/installNextcloud.env
-. $DIR/upgradeNextcloud.sh
-. $DIR/upgradeTetrasBack.sh
-. $DIR/upgradeDolibarr.sh
+if [ -z "$MODS" ]
+then
+    echo "Please update your main.env to list the installed modules"
+    exit 1
+fi
+for mod in $MODS
+do
+    script="$DIR/upgrade$mod.sh"
+    if [ -f $script ]
+    then
+        . $script
+    fi
+done
 systemctl restart systemd-logind
 checkrestart

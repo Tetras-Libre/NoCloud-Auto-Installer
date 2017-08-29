@@ -16,14 +16,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-aptitude update && aptitude upgrade
 DIR=`dirname $0`
 . $DIR/main.env
 . $DIR/installNextcloud.env
-if [ -z "$MODS" ]
+if [ -z "$MODS" ] || [ -z "$MAINTENANCE_LEVEL" ]
 then
-    echo "Please update your main.env to list the installed modules"
+    echo "Please update your main.env"
     exit 1
+fi
+aptitude update
+if [ "$MAINTENANCE_LEVEL" == "upgrade" ]
+then
+    aptitude upgrade
+else
+    unattended-upgrade
 fi
 for mod in $MODS
 do

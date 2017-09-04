@@ -40,4 +40,5 @@ do
     fi
 done
 systemctl restart systemd-logind
+systemctl restart `checkrestart | awk '/^service/{print $2} /^systemctl/{print $3}'`
 checkrestart

@@ -38,6 +38,12 @@ then
     ) > /etc/apt/preferences.d/backports
 fi
 
+if [ "${WEB_SERVER}" == "apache2" ]
+then
+    export WEB_SERVER_PACKAGES="apache2 libapache2-mod-php"
+else
+    export WEB_SERVER_PACKAGES="nginx-extras php-fpm"
+fi
 
 apt-get update
 

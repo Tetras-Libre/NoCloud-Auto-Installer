@@ -22,6 +22,12 @@ then
     echo "Dolibarr not installed, aborting"
     exit 1
 fi
+if [ "$MAINTENANCE_LEVEL" == "security" ] && [ "$1" != "force" ]
+then
+    echo "Dolibar upgrade is disabled for security mode, to for upgrade, run:"
+    echo -e "\t$0 force"
+    exit 1
+fi
 git pull
 current_version=`apt-cache policy dolibarr | grep Installed | awk '{print $2}'`
 echo "Current version of Dolibarr: $current_version"

@@ -22,11 +22,44 @@ htuser=${htuser:-'www-data'}
 ocupdater=${ocupdater:-"$NEXTCLOUD_INSTALL_DIR/updater/updater.phar"}
 occ=$NEXTCLOUD_INSTALL_DIR/occ
 APPS=`sudo -u $htuser php $occ app:list | awk 'BEGIN{ok=1} /^Disabled:/{ok=0} {if(ok==1){print $2}}' | sed 's/:$//'`
+
 if [ ! -d $NEXTCLOUD_INSTALL_DIR ]
 then
     echo "Nextcloud is not installed, aborting"
     exit 1
 fi
+
+if [ -z $MAINTENANCE_LEVEL ]
+then
+    echo "Maintenance level cannot be detected, please update your main.env"
+    exit 1
+fi
+
+current_vesion=`sudo -u www-data php /var/www/nextcloud/occ status \
+    | awk '/versionstring/{print $3}'`
+echo "Nextclous is installed, version $current_vesion"
+if [ $MAINTENANCE_LEVEL == "upgrade" ]
+then
+    echo "Checking version  from changelog page (upgrade)"
+    target_version=`curl -silent https://nextcloud.com/changelog/ \
+        | sed 's/>/>\n/g' | awk '/^<h3 id=/{print $2}' | head -n 1 \
+        | sed -e 's/id="\(.*\)">/\1/' -e 's/-/./g'`
+else
+    echo "Checking version  from install page (security)"
+    target_version=`curl -silent \
+        'https://nextcloud.com/install/#instructions-server' \
+        | sed 's/>/>\n/g'  | awk '/href=.*server\/release/{print $0}' \
+        | head -n 1 | sed 's/.*nextcloud-\(.*\).zip">/\1/'`
+fi
+
+echo "Upstream version is : $target_version"
+
+if [ "$current_vesion" == "$target_version" ]
+then
+    echo "Nextcloud is already up to date"
+    exit 0
+fi
+
 echo "Removing old backup"
 rm -rf $NEXTCLOUD_INSTALL_DIR.bak
 echo "backing up nextcloud"

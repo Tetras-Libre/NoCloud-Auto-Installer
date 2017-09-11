@@ -39,6 +39,7 @@ do
         . $script
     fi
 done
-systemctl restart systemd-logind
-systemctl restart `checkrestart | awk '/^service/{print $2} /^systemctl/{print $3}'`
+services="`checkrestart | awk '/^service/{print $2} /^systemctl/{print $3}'` \
+    $EXTRAS_SERVICES_TO_RESTART"
+[ ! -z "$services" ] && systemctl restart $services
 checkrestart

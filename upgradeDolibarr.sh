@@ -24,7 +24,7 @@ then
 fi
 if [ "$MAINTENANCE_LEVEL" == "security" ] && [ "$1" != "force" ]
 then
-    echo "Dolibar upgrade is disabled for security mode, to for upgrade, run:"
+    echo "Dolibar upgrade is disabled for security mode, to force upgrade, run:"
     echo -e "\t$0 force"
     exit 1
 fi

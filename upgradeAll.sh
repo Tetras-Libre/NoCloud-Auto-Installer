@@ -36,7 +36,7 @@ do
     script="$DIR/upgrade$mod.sh"
     if [ -f $script ]
     then
-        $DIR/$script
+        $script
     fi
 done
 services="`checkrestart | awk '/^service/{print $2} /^systemctl/{print $3}'` \

@@ -18,6 +18,7 @@
 
 set -o nounset                              # Treat unset variables as an error
 
+. `pwd`/main.env
 if [ -f installDolibarr.env ]
 then
     . `pwd`/installDolibarr.env

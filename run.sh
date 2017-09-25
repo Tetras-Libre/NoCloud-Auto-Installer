@@ -27,6 +27,7 @@ fi
 
 for mod in $MODS
 do
+    mod="install$mod"
     if [ -f $mod.sh ]
     then
         sh `pwd`/$mod.sh | tee -a $mod.log install.log

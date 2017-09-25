@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-OLD=`pwd`
-DIR=$DIR
+OLD=$PWD
+DIR="$OLD/Tetras-back"
 if [ ! -d $DIR ]
 then
     echo "Tetras-back not installed, aborting"

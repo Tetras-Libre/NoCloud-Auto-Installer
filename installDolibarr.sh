@@ -18,6 +18,7 @@
 
 set -o nounset                              # Treat unset variables as an error
 
+. `pwd`/main.env
 if [ -f installDolibarr.env ]
 then
     . `pwd`/installDolibarr.env
@@ -97,9 +98,9 @@ then
     echo "/home/dolibarr ${DOLIBARR_DOCUMENTS_DIR} none bind 0 0"
 else
     echo "\"/home/dolibarr ${DOLIBARR_DOCUMENTS_DIR} none bind 0 0\"" \
-        "> /etc/fstab"
+        ">> /etc/fstab"
     echo "/home/dolibarr ${DOLIBARR_DOCUMENTS_DIR} none bind 0 0" \
-        > /etc/fstab
+        >> /etc/fstab
 fi
 mount ${VERBOSE:+v} /usr/share/dolibarr/documents
 

@@ -24,7 +24,7 @@ then
 fi
 if [ "$MAINTENANCE_LEVEL" == "security" ] && [ "$1" != "force" ]
 then
-    echo "Dolibar upgrade is disabled for security mode, to for upgrade, run:"
+    echo "Dolibar upgrade is disabled for security mode, to force upgrade, run:"
     echo -e "\t$0 force"
     exit 1
 fi
@@ -39,6 +39,9 @@ then
 echo "Current version of Dolibarr is the last version in our repo, nothing to do"
     exit
 fi
+echo "Backing up database"
+mysqldump --databases dolibarr > /root/dolibbarr.sql
+mysqldump --all-databases > /root/dbs.sql
 echo "Installing $package"
 dpkg -i $package
 echo "Fixing dependencies"

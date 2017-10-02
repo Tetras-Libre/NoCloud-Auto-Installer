@@ -182,4 +182,6 @@ fi
 echo "cd ${SCRIPT_DIRECTORY}"
 cd ${SCRIPT_DIRECTORY}
 
+[ -f "DOLIBARR_PACKAGES/apply_patch.sh" ] && /bin/bash DOLIBARR_PACKAGES/apply_patch.sh
+
 

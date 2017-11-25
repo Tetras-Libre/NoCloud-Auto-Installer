@@ -47,5 +47,6 @@ dpkg -i $package
 echo "Fixing dependencies"
 apt-get -f install
 rm /usr/share/dolibarr/documents/install.lock
+[ -f "DOLIBARR_PACKAGES/apply_patch.sh" ] && /bin/bash DOLIBARR_PACKAGES/apply_patch.sh
 echo "One final step is required to upgrade to Dolibarr $last_repo_version:"
 echo "Please go to your Dolibarr page and run the manual upgrade step"

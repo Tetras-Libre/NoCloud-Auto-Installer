@@ -24,7 +24,7 @@ apt-get update && apt-get install certbot
 DOMAINS="dolibarr.${DOMAIN},nextcloud.${DOMAIN},tetras-back.${DOMAIN}"
 ARGS="--hsts --must-staple --email=${SERVER_ADMIN} --domains=${DOMAINS}
     --text --agree-tos"
-line="0 1 * * `date +%u` /usr/bin/certbot renew --force-renewal"
+line="0 1 * * `date +%u` /usr/bin/certbot renew --force-renewal > /var/log/certbot.log 2>&1"
 if [ "${WEB_SERVER}" == "apache2" ]
 then
     additional_packages="python-certbot-apache"

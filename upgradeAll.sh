@@ -43,3 +43,10 @@ services="`checkrestart | awk '/^service/{print $2} /^systemctl/{print $3}'` \
     $EXTRAS_SERVICES_TO_RESTART"
 [ ! -z "$services" ] && systemctl restart $services
 checkrestart
+echo -e "\tPlease check that the following services are up and running"
+if [ "${WEB_SERVER}" == "apache2" ]
+then
+    apache2ctl -S 2>/dev/null | awk '/namevhost/{print "https://"$4}' | sort -u | grep -v "127.0...1"
+else
+    awk '/^[ \t]*(server_name|server_alias)/{gsub(/;$/, "", $2); print "https://"$2}' /etc/nginx/*-enabled/* | sort -u
+fi

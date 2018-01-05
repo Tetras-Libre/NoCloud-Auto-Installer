@@ -89,5 +89,4 @@ then
     echo "Failed to enable some apps: '$FAILED'"
 fi
 echo "Please check difference between old and new .htaccess file"
-
-
+vimdiff $NEXTCLOUD_INSTALL_DIR{,.bak}/.htacess
